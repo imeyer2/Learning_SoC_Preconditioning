@@ -1,0 +1,68 @@
+# Data Generation Configuration
+
+# Problem type: anisotropic, elasticity, helmholtz, custom
+problem_type: anisotropic
+
+# Training dataset
+train:
+  num_samples: 30
+  grid_size: 32
+  seed: 0
+
+# Validation dataset (optional)
+validation:
+  enabled: true
+  num_samples: 10
+  grid_size: 32
+  seed: 1000
+
+# Anisotropic diffusion parameters
+anisotropic:
+  # Parameter distribution modes (cyclic pattern across samples)
+  modes:
+    - epsilon: 1.0
+      theta: 0.0
+    - epsilon: 0.001
+      theta: 0.0
+    - epsilon: 0.001
+      theta_range: [0.0, 1.5708]  # [0, pi/2]
+  
+  # Stencil type
+  stencil_type: FD  # FD (finite difference) or FE (finite element)
+
+# Elasticity parameters (if problem_type: elasticity)
+elasticity:
+  young_modulus: 1.0
+  poisson_ratio: 0.3
+  problem_type: linear  # linear, nonlinear
+
+# Helmholtz parameters (if problem_type: helmholtz)
+helmholtz:
+  wave_number: 10.0
+  
+# Custom problem (if problem_type: custom)
+custom:
+  generator_class: null  # Fully qualified class name
+  params: {}
+
+# Smooth error generation for policy features
+smooth_errors:
+  num_vecs: 4
+  relax_iters: 5
+  relaxation_scheme: jacobi  # jacobi, gauss_seidel, richardson
+  omega: 0.6666666  # Relaxation parameter
+  seed: null  # Random seed for error generation
+
+# Node features
+node_features:
+  use_relaxed_vectors: true
+  use_coordinates: true
+  use_degree: false
+  use_random: false
+  normalize: true
+
+# Graph construction
+graph:
+  self_loops: true
+  normalize_weights: true
+  weight_threshold: 0.0  # Minimum weight to include edge

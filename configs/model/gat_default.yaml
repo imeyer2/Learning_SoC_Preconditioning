@@ -1,0 +1,48 @@
+# Model Architecture Configuration
+
+# GNN backbone type: gat, gcn, graphsage
+backbone: gat
+
+# Input features
+input_channels: 6  # 4 relaxed vectors + 2 coordinate dimensions
+
+# Hidden layer dimensions
+hidden_dim: 64
+
+# GAT-specific settings
+gat:
+  heads_layer1: 2
+  heads_layer2: 1
+  concat_layer1: true
+  dropout: 0.0
+
+# GCN-specific settings (if backbone: gcn)
+gcn:
+  num_layers: 2
+  dropout: 0.0
+
+# GraphSAGE-specific settings (if backbone: graphsage)
+graphsage:
+  num_layers: 2
+  aggregator: mean  # mean, max, lstm
+  dropout: 0.0
+
+# Edge feature engineering
+edge_features:
+  use_weight: true
+  use_similarity: true
+  use_direction: true
+  direction_components: 6  # dx, dy, |dx|, |dy|, dx/norm, dy/norm
+
+# Edge MLP architecture
+edge_mlp:
+  layers: [128, 64, 1]
+  activation: relu
+
+# B-candidate learning (near-nullspace for PyAMG)
+learn_B: true
+B_extra: 2  # Number of additional candidates beyond constant vector
+
+B_head:
+  layers: [64]
+  activation: relu

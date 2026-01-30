@@ -1,0 +1,117 @@
+# Challenging Evaluation Suite
+# Non-tridiagonal problems - Helmholtz, extreme anisotropy, difficult rotations
+
+test_cases:
+  # ============================================================
+  # HELMHOLTZ (Indefinite - wave problems)
+  # ============================================================
+  - name: helmholtz_k5_64
+    problem_type: helmholtz
+    grid_size: 64
+    params:
+      shift: 25.0
+      
+  - name: helmholtz_k10_64
+    problem_type: helmholtz
+    grid_size: 64
+    params:
+      shift: 100.0
+      
+  - name: helmholtz_k15_64
+    problem_type: helmholtz  
+    grid_size: 64
+    params:
+      shift: 225.0
+  
+  # ============================================================
+  # EXTREME ANISOTROPY (CFD boundary layers - 100,000:1 ratio)
+  # ============================================================
+  - name: boundary_layer_aligned_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.00001
+      theta: 0.0
+      
+  - name: boundary_layer_rot10_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.00001
+      theta: 0.1745
+      
+  - name: boundary_layer_rot45_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.00001
+      theta: 0.7854
+      
+  - name: boundary_layer_rot75_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.00001
+      theta: 1.3090
+  
+  # ============================================================
+  # NON-GRID-ALIGNED ROTATIONS
+  # ============================================================
+  - name: rot22_5_strong_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.001
+      theta: 0.3927
+      
+  - name: rot37_5_strong_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.001
+      theta: 0.6545
+      
+  - name: rot67_5_strong_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.001
+      theta: 1.1781
+  
+  # ============================================================
+  # LARGER GRIDS
+  # ============================================================
+  - name: helmholtz_k10_128
+    problem_type: helmholtz
+    grid_size: 128
+    params:
+      shift: 100.0
+      
+  - name: boundary_layer_rot45_128
+    problem_type: anisotropic
+    grid_size: 128
+    params:
+      epsilon: 0.00001
+      theta: 0.7854
+
+pcg:
+  enabled: true
+  tolerance: 1.0e-6
+  max_iterations: 1000
+
+vcycle:
+  enabled: true
+  num_test_vecs: 10
+  relax_iters: 30
+
+eigenvalue:
+  enabled: true
+  method: fast
+  max_grid_size: 256
+
+pyamg:
+  coarse_solver: splu
+  max_levels: 15
+
+visualization:
+  enabled: true

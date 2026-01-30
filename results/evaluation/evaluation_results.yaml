@@ -1,0 +1,361 @@
+boundary_layer_aligned_64:
+  Convergence Rate (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - &id001 !!python/object/apply:numpy.dtype
+    args:
+    - f8
+    - false
+    - true
+    state: !!python/tuple
+    - 3
+    - <
+    - null
+    - null
+    - null
+    - -1
+    - -1
+    - 0
+  - !!binary |
+    IAbf2jC74z8=
+  Convergence Rate (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AUhzFRHO4z8=
+  PCG Iterations (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAACASUA=
+  PCG Iterations (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    mpmZmZkZRkA=
+  PCG Speedup: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    Yid2Yid28j8=
+  V-cycle Reduction (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    JpvUDBmn6j8=
+  V-cycle Reduction (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    vXh8pBwv6j8=
+boundary_layer_rot10_64:
+  Convergence Rate (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    h4A66+AK5j8=
+  Convergence Rate (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    u85/V0Zc5j8=
+  PCG Iterations (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAANkA=
+  PCG Iterations (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAAM0A=
+  PCG Speedup: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    bCivobyG8j8=
+  V-cycle Reduction (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    uYMmWa6T5z8=
+  V-cycle Reduction (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    ou7IdOi55j8=
+boundary_layer_rot45_128:
+  Convergence Rate (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    K7dRGAU/6j8=
+  Convergence Rate (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    IanPsXfj7D8=
+  PCG Iterations (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    MzMzMzMzNUA=
+  PCG Iterations (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAAKkA=
+  PCG Speedup: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    eqEXeqEX+j8=
+  V-cycle Reduction (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    gmQ40RPi5j8=
+  V-cycle Reduction (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    1iy+xSfB4z8=
+boundary_layer_rot45_64:
+  Convergence Rate (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    +zXKtSmj6z8=
+  Convergence Rate (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    QS0+AD/R7T8=
+  PCG Iterations (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAALkA=
+  PCG Iterations (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAAJkA=
+  PCG Speedup: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    0UUXXXTR9T8=
+  V-cycle Reduction (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    ChpZVw9v5D8=
+  V-cycle Reduction (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    juzU1Fkg4T8=
+boundary_layer_rot75_64:
+  Convergence Rate (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    SCd32ho05z8=
+  Convergence Rate (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    HBdH7STI5z8=
+  PCG Iterations (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    zczMzMzMMkA=
+  PCG Iterations (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    mpmZmZmZL0A=
+  PCG Speedup: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    E+Z3tbgJ8z8=
+  V-cycle Reduction (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    StwWaWpr5j8=
+  V-cycle Reduction (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    yzq73FEW5T8=
+helmholtz_k10_128:
+  Convergence Rate (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    0tWS9+ZFI0A=
+  Convergence Rate (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AkgbLTFEI0A=
+  PCG Iterations (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAA8D8=
+  PCG Iterations (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAA8D8=
+  PCG Speedup: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAA8D8=
+  V-cycle Reduction (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    Gtq0y+ds5T8=
+  V-cycle Reduction (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    vGXv0j5v5T8=
+helmholtz_k10_64:
+  Convergence Rate (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    qJHJrVuoKEA=
+  Convergence Rate (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    GO3RWcqoKEA=
+  PCG Iterations (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAA8D8=
+  PCG Iterations (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAA8D8=
+  PCG Speedup: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAA8D8=
+  V-cycle Reduction (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    PvwB/Ihu5T8=
+  V-cycle Reduction (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    tl3F5Axu5T8=
+helmholtz_k15_64:
+  Convergence Rate (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    mIn2j7KkKEA=
+  Convergence Rate (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    yYmYoYepKEA=
+  PCG Iterations (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAA8D8=
+  PCG Iterations (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAA8D8=
+  PCG Speedup: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAA8D8=
+  V-cycle Reduction (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    2PpR3v9t5T8=
+  V-cycle Reduction (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    ETXyVchu5T8=
+helmholtz_k5_64:
+  Convergence Rate (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    xz+CkZmlKEA=
+  Convergence Rate (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    0Axfhb+pKEA=
+  PCG Iterations (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAA8D8=
+  PCG Iterations (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAA8D8=
+  PCG Speedup: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAA8D8=
+  V-cycle Reduction (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    jBW23Jxs5T8=
+  V-cycle Reduction (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    hcXm7jRu5T8=
+rot22_5_strong_64:
+  Convergence Rate (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    3j0d93c/6j8=
+  Convergence Rate (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AtWvGCLs6j8=
+  PCG Iterations (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAAMEA=
+  PCG Iterations (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    MzMzMzMzK0A=
+  PCG Speedup: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    09LS0tLS8j8=
+  V-cycle Reduction (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    pSNVQ7YM5T8=
+  V-cycle Reduction (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    rpZYMnCW4j8=
+rot37_5_strong_64:
+  Convergence Rate (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    8ZSWx2kI6z8=
+  Convergence Rate (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    /mFq5Top7z8=
+  PCG Iterations (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    MzMzMzMzLUA=
+  PCG Iterations (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    mpmZmZmZJUA=
+  PCG Speedup: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    EtpLaC+h9T8=
+  V-cycle Reduction (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    JvfOi9pl5D8=
+  V-cycle Reduction (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    XSjJ3U/c4D8=
+rot67_5_strong_64:
+  Convergence Rate (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    9rgmNsfz6D8=
+  Convergence Rate (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    z5w0qrL06T8=
+  PCG Iterations (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    mpmZmZmZL0A=
+  PCG Iterations (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAAKkA=
+  PCG Speedup: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    JDdyIzdy8z8=
+  V-cycle Reduction (Baseline): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    bakVNK2G5T8=
+  V-cycle Reduction (Learned): !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    pvUO3vZo4z8=

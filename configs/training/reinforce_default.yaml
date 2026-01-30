@@ -1,0 +1,86 @@
+# Training Configuration
+
+# RL Algorithm: reinforce, ppo, a2c (currently only reinforce implemented)
+algorithm: reinforce
+
+# Training parameters
+epochs: 40
+batch_size: 1  # Process one problem at a time (policy gradient per problem)
+
+# Optimizer
+optimizer:
+  type: adam
+  lr: 0.002
+  weight_decay: 0.0
+  grad_clip: 1.0
+
+# Learning rate scheduler (optional)
+scheduler:
+  enabled: false
+  type: step  # step, cosine, exponential
+  step_size: 10
+  gamma: 0.9
+
+# Temperature for stochastic sampling
+temperature:
+  initial: 0.9
+  anneal: true
+  anneal_factor: 0.97
+  min_temperature: 0.5
+
+# Sampling strategy
+sampling:
+  k_per_row: 3  # Number of strong edges to select per node
+  method: topk_without_replacement  # topk_without_replacement, gumbel_softmax
+  gumbel: true
+
+# Reward configuration
+reward:
+  function: vcycle_energy_reduction  # vcycle_energy_reduction, pcg_iterations, hybrid
+  
+  # V-cycle reward parameters
+  vcycle:
+    num_test_vecs: 6
+    relax_iters: 25
+    omega: 0.6666666  # 2/3
+    cycle_type: V  # V or W
+  
+  # Complexity penalty
+  complexity:
+    target: 1.35
+    penalty_weight: 1.0
+  
+  # Hybrid reward (if function: hybrid)
+  hybrid:
+    vcycle_weight: 0.7
+    pcg_weight: 0.3
+
+# Baseline for variance reduction
+baseline:
+  type: moving_average  # moving_average, value_network, none
+  momentum: 0.95  # For moving_average
+  
+  # Value network baseline (if type: value_network)
+  value_network:
+    hidden_dim: 64
+    lr: 0.001
+
+# Logging and checkpointing
+logging:
+  log_interval: 1  # Log every N steps
+  probe_interval: 1  # Run probe diagnostics every N epochs
+  save_interval: 5  # Save checkpoint every N epochs
+
+# Experiment tracking
+experiment:
+  name: null  # Auto-generated if null
+  output_dir: outputs
+  save_best: true
+  save_last: true
+
+# PyAMG solver settings
+pyamg:
+  coarse_solver: splu  # splu, lu, cg, gauss_seidel
+  
+# Device
+device: cpu  # cpu or cuda

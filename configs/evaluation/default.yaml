@@ -1,0 +1,284 @@
+# Evaluation Configuration
+# Comprehensive test suite for validating learned AMG policies
+
+# Test cases to evaluate - organized by difficulty and characteristics
+test_cases:
+  # ============================================================
+  # ISOTROPIC PROBLEMS (Baseline - Should be easy)
+  # ============================================================
+  - name: isotropic_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 1.0
+      theta: 0.0
+      
+  - name: isotropic_128
+    problem_type: anisotropic
+    grid_size: 128
+    params:
+      epsilon: 1.0
+      theta: 0.0
+  
+  # ============================================================
+  # AXIS-ALIGNED ANISOTROPY (Moderate difficulty)
+  # ============================================================
+  - name: axis_weak_aniso_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.1
+      theta: 0.0
+      
+  - name: axis_medium_aniso_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.01
+      theta: 0.0
+      
+  - name: axis_strong_aniso_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.001
+      theta: 0.0
+      
+  - name: axis_extreme_aniso_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.0001
+      theta: 0.0
+  
+  # ============================================================
+  # ROTATED ANISOTROPY (Higher difficulty)
+  # ============================================================
+  - name: rot15_medium_aniso_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.01
+      theta: 0.2618  # 15 degrees
+      
+  - name: rot30_medium_aniso_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.01
+      theta: 0.5236  # 30 degrees
+      
+  - name: rot45_medium_aniso_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.01
+      theta: 0.7854  # 45 degrees
+      
+  - name: rot60_medium_aniso_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.01
+      theta: 1.0472  # 60 degrees
+  
+  # ============================================================
+  # STRONG ROTATED ANISOTROPY (Challenging)
+  # ============================================================
+  - name: rot20_strong_aniso_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.001
+      theta: 0.3491  # 20 degrees
+      
+  - name: rot35_strong_aniso_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.001
+      theta: 0.6109  # 35 degrees
+      
+  - name: rot50_strong_aniso_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.001
+      theta: 0.8727  # 50 degrees
+  
+  # ============================================================
+  # LARGER GRIDS (Scalability test)
+  # ============================================================
+  - name: axis_medium_aniso_128
+    problem_type: anisotropic
+    grid_size: 128
+    params:
+      epsilon: 0.01
+      theta: 0.0
+      
+  - name: rot30_medium_aniso_128
+    problem_type: anisotropic
+    grid_size: 128
+    params:
+      epsilon: 0.01
+      theta: 0.5236  # 30 degrees
+      
+  - name: rot45_strong_aniso_128
+    problem_type: anisotropic
+    grid_size: 128
+    params:
+      epsilon: 0.001
+      theta: 0.7854  # 45 degrees
+  
+  # ============================================================
+  # INTERPOLATION TESTS (Between training conditions)
+  # ============================================================
+  - name: interp_eps_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.005  # Between 0.01 and 0.001
+      theta: 0.0
+      
+  - name: interp_theta_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.01
+      theta: 0.4363  # 25 degrees (between 15 and 30)
+      
+  - name: interp_both_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.005
+      theta: 0.4363  # 25 degrees
+  
+  # ============================================================
+  # EDGE CASES (Stress tests)
+  # ============================================================
+  - name: near_isotropic_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.9
+      theta: 0.0
+      
+  - name: ultra_extreme_aniso_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.00001
+      theta: 0.0
+      
+  - name: rot85_strong_aniso_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.001
+      theta: 1.4835  # 85 degrees (nearly horizontal)
+
+# PCG convergence analysis
+pcg:
+  enabled: true
+  tolerance: 1.0e-8
+  max_iterations: 500
+  right_hand_side: random  # ones, random, smooth
+
+# V-cycle analysis
+vcycle:
+  enabled: true
+  num_test_vecs: 10
+  relax_iters: 25
+  cycle_type: V  # V or W
+
+# Eigenvalue analysis
+eigenvalue:
+  enabled: true
+  method: fast  # 'fast' = convergence-based (cheap), 'eigenvalues' = full spectrum (expensive)
+  max_grid_size: 256  # Can handle larger grids now with fast method
+  num_eigenvalues: 20  # Only used for method='eigenvalues'
+
+# Baseline comparisons
+baselines:
+  - name: std_theta0
+    method: standard_amg
+    params:
+      theta: 0.0
+      
+  - name: std_theta025
+    method: standard_amg
+    params:
+      theta: 0.25
+      
+  - name: std_theta05
+    method: standard_amg
+    params:
+      theta: 0.5
+
+# PyAMG solver settings
+pyamg:
+  coarse_solver: splu  # splu, lu, cg, gauss_seidel
+  max_coarse: 10
+  max_levels: 10
+
+# Visualization settings
+visualization:
+  enabled: true
+  
+  # What to generate
+  plots:
+    convergence: true
+    sparsity_patterns: true
+    sparsity_comparison: true
+    eigenvalue_spectra: true
+    iteration_bars: true
+    weight_vs_logit: true
+    probe_metrics: true
+  
+  # Sparsity visualization
+  sparsity:
+    # Full matrix heatmap
+    heatmap:
+      enabled: true
+      bins: 512
+      log_scale: true
+      
+    # Spy plots (zoomed regions)
+    spy:
+      enabled: true
+      max_display_size: 2000  # Crop to top-left region
+      zoom_regions:
+        - center: [null, null]  # null = middle
+          window: 50
+    
+    # Comparison overlays (learned vs standard)
+    comparison:
+      enabled: true
+      overlay_heatmap: true
+      overlay_spy: true
+      
+    # Prolongation operator P
+    prolongation:
+      enabled: true
+      max_display_size: 2000
+  
+  # Plot aesthetics
+  style:
+    dpi: 200
+    figure_size: [8, 6]
+    font_size: 10
+    
+# Statistics to compute
+statistics:
+  c_matrix_overlap: true  # IoU, intersection metrics
+  operator_complexity: true
+  convergence_factor: true
+  condition_number: true  # From eigenvalue analysis
+
+# Output
+output:
+  directory: null  # Auto-generated if null
+  save_matrices: false  # Save C matrices as .npz
+  save_stats_csv: true
+  save_summary_json: true

@@ -1,0 +1,58 @@
+# Quick Evaluation Configuration
+# Minimal test suite for rapid validation during development
+
+test_cases:
+  # Representative samples from each category
+  - name: isotropic_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 1.0
+      theta: 0.0
+      
+  - name: axis_medium_aniso_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.01
+      theta: 0.0
+      
+  - name: rot30_medium_aniso_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.01
+      theta: 0.5236  # 30 degrees
+      
+  - name: rot45_strong_aniso_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.001
+      theta: 0.7854  # 45 degrees
+
+# Analysis settings (faster)
+pcg:
+  enabled: true
+  tolerance: 1.0e-8
+  max_iterations: 100
+
+vcycle:
+  enabled: true
+  num_test_vecs: 5
+  relax_iters: 10
+  cycle_type: V
+
+eigenvalue:
+  enabled: false  # Skip for speed
+  method: fast  # If enabled, use fast method
+
+# PyAMG settings... i thought pyamg was being used in PCG? what does max_coarse do? max_levels?
+pyamg:
+  coarse_solver: splu
+  max_coarse: 10
+  max_levels: 10
+
+# Minimal visualization
+visualization:
+  enabled: true

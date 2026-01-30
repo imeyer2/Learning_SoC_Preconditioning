@@ -1,0 +1,141 @@
+# Generalization Test Configuration
+# Test model performance on conditions not seen during training
+
+test_cases:
+  # ============================================================
+  # INTERPOLATION (Between training distributions)
+  # ============================================================
+  - name: interp_eps_0p005_theta0
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.005  # Between typical 0.01 and 0.001
+      theta: 0.0
+      
+  - name: interp_eps_0p005_theta25
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.005
+      theta: 0.4363  # 25 degrees
+      
+  - name: interp_theta_12p5
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.01
+      theta: 0.2182  # 12.5 degrees
+      
+  - name: interp_theta_37p5
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.01
+      theta: 0.6545  # 37.5 degrees
+      
+  - name: interp_theta_52p5
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.01
+      theta: 0.9163  # 52.5 degrees
+  
+  # ============================================================
+  # EXTRAPOLATION (Outside training range)
+  # ============================================================
+  - name: extrap_weaker_aniso
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.2  # Weaker than typical training
+      theta: 0.0
+      
+  - name: extrap_stronger_aniso
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.0005  # Stronger than typical training
+      theta: 0.0
+      
+  - name: extrap_rot70
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.01
+      theta: 1.2217  # 70 degrees
+      
+  - name: extrap_rot80
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.01
+      theta: 1.3963  # 80 degrees
+  
+  # ============================================================
+  # GRID SIZE GENERALIZATION
+  # ============================================================
+  - name: small_grid_32
+    problem_type: anisotropic
+    grid_size: 32
+    params:
+      epsilon: 0.01
+      theta: 0.5236  # 30 degrees
+      
+  - name: large_grid_192
+    problem_type: anisotropic
+    grid_size: 192
+    params:
+      epsilon: 0.01
+      theta: 0.5236  # 30 degrees
+      
+  - name: very_large_grid_256
+    problem_type: anisotropic
+    grid_size: 256
+    params:
+      epsilon: 0.01
+      theta: 0.5236  # 30 degrees
+  
+  # ============================================================
+  # COMBINED EXTRAPOLATION
+  # ============================================================
+  - name: extrap_both_weaker
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.2
+      theta: 0.6545  # 37.5 degrees
+      
+  - name: extrap_both_stronger
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.0005
+      theta: 1.2217  # 70 degrees
+
+# Analysis settings
+pcg:
+  enabled: true
+  tolerance: 1.0e-8
+  max_iterations: 500
+
+vcycle:
+  enabled: true
+  num_test_vecs: 10
+  relax_iters: 25
+  cycle_type: V
+
+eigenvalue:
+  enabled: true
+  method: fast  # Use fast method for efficiency  
+  max_grid_size: 256
+  num_eigenvalues: 20
+
+# PyAMG settings
+pyamg:
+  coarse_solver: splu
+  max_coarse: 10
+  max_levels: 10
+
+# Visualization
+visualization:
+  enabled: true

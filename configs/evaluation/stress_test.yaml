@@ -1,0 +1,103 @@
+# Stress Test Configuration
+# Challenging problems to test model robustness
+
+test_cases:
+  # ============================================================
+  # EXTREME ANISOTROPY
+  # ============================================================
+  - name: extreme_axis_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.0001
+      theta: 0.0
+      
+  - name: extreme_rot30_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.0001
+      theta: 0.5236  # 30 degrees
+      
+  - name: extreme_rot45_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.0001
+      theta: 0.7854  # 45 degrees
+      
+  - name: ultra_extreme_axis_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.00001
+      theta: 0.0
+  
+  # ============================================================
+  # DIFFICULT ROTATIONS
+  # ============================================================
+  - name: rot10_strong_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.001
+      theta: 0.1745  # 10 degrees
+      
+  - name: rot75_strong_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.001
+      theta: 1.3090  # 75 degrees
+      
+  - name: rot85_strong_64
+    problem_type: anisotropic
+    grid_size: 64
+    params:
+      epsilon: 0.001
+      theta: 1.4835  # 85 degrees
+  
+  # ============================================================
+  # LARGE GRIDS
+  # ============================================================
+  - name: extreme_axis_256
+    problem_type: anisotropic
+    grid_size: 256
+    params:
+      epsilon: 0.0001
+      theta: 0.0
+      
+  - name: rot45_strong_256
+    problem_type: anisotropic
+    grid_size: 256
+    params:
+      epsilon: 0.001
+      theta: 0.7854  # 45 degrees
+
+# Analysis settings
+pcg:
+  enabled: true
+  tolerance: 1.0e-6  # Relaxed for hard problems
+  max_iterations: 1000
+
+vcycle:
+  enabled: true
+  num_test_vecs: 20
+  relax_iters: 50
+  cycle_type: V
+
+eigenvalue:
+  enabled: true
+  method: fast  # Essential for 256x256 grids
+  max_grid_size: 256
+  num_eigenvalues: 15
+
+# PyAMG settings
+pyamg:
+  coarse_solver: splu
+  max_coarse: 10
+  max_levels: 15
+
+# Full visualization
+visualization:
+  enabled: true
