@@ -1,0 +1,14 @@
+{
+  "problem_id": "test_0011",
+  "grid_size": 32,
+  "n": 2048,
+  "params": {
+    "E": 10478.534674732133,
+    "nu": 0.28561206832711833
+  },
+  "learned_iterations": 20,
+  "baseline_iterations": 21,
+  "tuned_iterations": 34,
+  "learned_time": 0.011229991912841797,
+  "baseline_time": 0.007516145706176758
+}

@@ -1,0 +1,14 @@
+{
+  "problem_id": "test_0041",
+  "grid_size": 1024,
+  "n": 1048576,
+  "params": {
+    "theta": 0.19177070839400331,
+    "epsilon": 0.0019559656761626615
+  },
+  "learned_iterations": 39,
+  "baseline_iterations": 84,
+  "tuned_iterations": 97,
+  "learned_time": 62.18432092666626,
+  "baseline_time": 9.80811595916748
+}

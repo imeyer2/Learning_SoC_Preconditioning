@@ -1,0 +1,247 @@
+{
+  "name": "case_study_1_anisotropic_B",
+  "train_params": [
+    {
+      "params": {
+        "theta": 2.950306030070987,
+        "epsilon": 0.0032462167539912125
+      },
+      "grid_size": 32,
+      "hash": "6719a16547d545ad"
+    },
+    {
+      "params": {
+        "theta": 2.7860534428589045,
+        "epsilon": 0.004104974786241306
+      },
+      "grid_size": 32,
+      "hash": "b9cfae63b97ac1a8"
+    },
+    {
+      "params": {
+        "theta": 5.2001597653962115,
+        "epsilon": 0.050680777174435476
+      },
+      "grid_size": 32,
+      "hash": "7cff9caa4fb53168"
+    },
+    {
+      "params": {
+        "theta": 2.883452717125864,
+        "epsilon": 0.03427799634270199
+      },
+      "grid_size": 32,
+      "hash": "adde98087c08bc46"
+    },
+    {
+      "params": {
+        "theta": 5.3947295714184,
+        "epsilon": 0.07623868423300403
+      },
+      "grid_size": 32,
+      "hash": "dc04da427c1202f3"
+    },
+    {
+      "params": {
+        "theta": 1.4257134183162792,
+        "epsilon": 0.0642403472921395
+      },
+      "grid_size": 32,
+      "hash": "4414fe9d5748f940"
+    },
+    {
+      "params": {
+        "theta": 2.0472210028732643,
+        "epsilon": 0.00999676848494054
+      },
+      "grid_size": 32,
+      "hash": "6066a6ab5fef4233"
+    },
+    {
+      "params": {
+        "theta": 3.4845588150060878,
+        "epsilon": 0.0014867599716649842
+      },
+      "grid_size": 32,
+      "hash": "1102425757c98511"
+    },
+    {
+      "params": {
+        "theta": 4.763205517188319,
+        "epsilon": 0.009054301536060688
+      },
+      "grid_size": 32,
+      "hash": "cf5fdd07b8550c50"
+    },
+    {
+      "params": {
+        "theta": 0.8049616551224996,
+        "epsilon": 0.016427751954957742
+      },
+      "grid_size": 32,
+      "hash": "627936acf7fe273d"
+    },
+    {
+      "params": {
+        "theta": 5.229242300229306,
+        "epsilon": 0.14860549252653657
+      },
+      "grid_size": 32,
+      "hash": "5347400eb213ab68"
+    },
+    {
+      "params": {
+        "theta": 2.4345983389467065,
+        "epsilon": 0.006000520225308894
+      },
+      "grid_size": 32,
+      "hash": "7717e8f9ceab9713"
+    },
+    {
+      "params": {
+        "theta": 4.8629090349461,
+        "epsilon": 0.015293952761249943
+      },
+      "grid_size": 32,
+      "hash": "776fc0e39f88d41a"
+    },
+    {
+      "params": {
+        "theta": 2.329792583887791,
+        "epsilon": 0.3171837329014025
+      },
+      "grid_size": 32,
+      "hash": "12cf852dd4ecb40e"
+    },
+    {
+      "params": {
+        "theta": 4.04552366451403,
+        "epsilon": 0.16619154104785644
+      },
+      "grid_size": 32,
+      "hash": "fcb7f507fe9e2cd8"
+    },
+    {
+      "params": {
+        "theta": 4.430684529504309,
+        "epsilon": 0.12798652166236135
+      },
+      "grid_size": 32,
+      "hash": "f2108d2c5be3763f"
+    },
+    {
+      "params": {
+        "theta": 6.09907526640769,
+        "epsilon": 0.2573398933799412
+      },
+      "grid_size": 32,
+      "hash": "59204db635ed6baa"
+    },
+    {
+      "params": {
+        "theta": 1.2560602191685635,
+        "epsilon": 0.0010468164658156503
+      },
+      "grid_size": 32,
+      "hash": "66813771667be8b7"
+    },
+    {
+      "params": {
+        "theta": 2.932494409802645,
+        "epsilon": 0.0013128800527954555
+      },
+      "grid_size": 32,
+      "hash": "fc12504ac5f015dd"
+    },
+    {
+      "params": {
+        "theta": 4.890727513061404,
+        "epsilon": 0.0033521545557804863
+      },
+      "grid_size": 32,
+      "hash": "7055aa0a54115b06"
+    },
+    {
+      "params": {
+        "theta": 4.679478406567657,
+        "epsilon": 0.4085824861876187
+      },
+      "grid_size": 32,
+      "hash": "7c84f9650ecaad50"
+    },
+    {
+      "params": {
+        "theta": 0.8163208535012554,
+        "epsilon": 0.01922707971132378
+      },
+      "grid_size": 32,
+      "hash": "a846001678d917db"
+    },
+    {
+      "params": {
+        "theta": 4.399895184924001,
+        "epsilon": 0.006967359110462964
+      },
+      "grid_size": 32,
+      "hash": "4766215c70c53965"
+    },
+    {
+      "params": {
+        "theta": 4.288245513143006,
+        "epsilon": 0.002383349655350177
+      },
+      "grid_size": 32,
+      "hash": "8afe94f3e653aa38"
+    },
+    {
+      "params": {
+        "theta": 0.8783704016807253,
+        "epsilon": 0.0020375732624345823
+      },
+      "grid_size": 32,
+      "hash": "56b74df6c0c556bb"
+    },
+    {
+      "params": {
+        "theta": 4.944391444855773,
+        "epsilon": 0.062289166462830274
+      },
+      "grid_size": 32,
+      "hash": "a99d37d9278e3784"
+    },
+    {
+      "params": {
+        "theta": 4.782381558450256,
+        "epsilon": 0.13230126033997305
+      },
+      "grid_size": 32,
+      "hash": "f9e4e649bf7b3b16"
+    },
+    {
+      "params": {
+        "theta": 2.7467063793798454,
+        "epsilon": 0.1767557189844014
+      },
+      "grid_size": 32,
+      "hash": "45d60e24270ff001"
+    },
+    {
+      "params": {
+        "theta": 0.5917336995874611,
+        "epsilon": 0.4297100021154879
+      },
+      "grid_size": 32,
+      "hash": "adde3b5add670166"
+    },
+    {
+      "params": {
+        "theta": 0.9694294222164355,
+        "epsilon": 0.06974749851257472
+      },
+      "grid_size": 32,
+      "hash": "233b271d309b6df7"
+    }
+  ],
+  "test_params": {},
+  "min_distance": 0.05
+}

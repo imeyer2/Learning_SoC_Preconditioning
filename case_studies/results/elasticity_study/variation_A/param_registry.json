@@ -1,0 +1,6 @@
+{
+  "name": "elasticity_study_A",
+  "train_params": [],
+  "test_params": {},
+  "min_distance": 0.05
+}

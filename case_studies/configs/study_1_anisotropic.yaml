@@ -1,0 +1,132 @@
+# Case Study 1: Anisotropic Diffusion
+# 
+# This case study evaluates learned AMG preconditioners on anisotropic diffusion problems.
+# The goal is to test generalization across:
+#   - Variation A: Same grid size, different parameters
+#   - Variation B: Scaling study (train small, test across sizes)
+#   - Variation C: Inverse transfer (train large, test small)
+
+name: case_study_1_anisotropic
+description: |
+  Anisotropic diffusion case study testing generalization of learned AMG.
+  Problem: -div(K * grad(u)) = f with anisotropic tensor K(epsilon, theta)
+
+problem:
+  type: anisotropic
+  parameters:
+    # Rotation angle of anisotropy (radians)
+    theta:
+      min: 0.0
+      max: 6.283185  # 2*pi
+    # Anisotropy ratio (smaller = more anisotropic)
+    epsilon:
+      min: 0.001
+      max: 0.5
+      log_scale: true
+
+variations:
+  # Variation A: Same grid train/test with disjoint parameters
+  A:
+    description: |
+      Train on 32x32 grid with 30 samples, test on 32x32 with 50 different samples.
+      Tests within-distribution generalization.
+    train:
+      grid_size: 32
+      num_samples: 200
+      seed: 42
+      epochs: 50
+      batch_size: 2
+      learning_rate: 0.001
+      model_config: configs/model/gat_default.yaml
+    test:
+      grid_size: 32
+      num_samples: 50
+      seed: 12345  # Different from train
+      scaling_study: false
+      collect_wall_time: true
+      collect_energy_history: true
+      collect_iterations: true
+      collect_spectral: false
+
+  # Variation B: Scaling study
+  B:
+    description: |
+      Train on 32x32, test across sizes from 64x64 to 500kx500k.
+      Tests scalability and size generalization.
+    train:
+      grid_size: 32
+      num_samples: 30
+      seed: 42
+      epochs: 50
+      batch_size: 1
+      learning_rate: 0.001
+      model_config: configs/model/gat_default.yaml
+    test:
+      grid_sizes:
+        - 64
+        - 128
+        - 256
+        - 512
+        - 1024
+        # Large sizes - be careful with memory!
+        # - 10000   # 100M DOFs
+        # - 25000   # 625M DOFs  
+        # - 50000   # 2.5B DOFs
+        # - 100000  # 10B DOFs
+      num_samples: 10  # per grid size
+      seed: 54321
+      scaling_study: true
+      collect_wall_time: true
+      collect_energy_history: true
+      collect_iterations: true
+      collect_spectral: false  # Too expensive for large sizes
+
+  # Variation C: Inverse transfer (train large, test small)
+  C:
+    description: |
+      Train on 128x128, test on 32x32.
+      Tests whether large-scale training transfers to small problems.
+    train:
+      grid_size: 128
+      num_samples: 30
+      seed: 42
+      epochs: 50
+      batch_size: 1
+      learning_rate: 0.001
+      model_config: configs/model/gat_default.yaml
+    test:
+      grid_size: 32
+      num_samples: 50
+      seed: 98765
+      scaling_study: false
+      collect_wall_time: true
+      collect_energy_history: true
+      collect_iterations: true
+      collect_spectral: true  # Small enough to compute
+
+  # Variation D: Random baseline (ablation study)
+  D:
+    description: |
+      Random baseline comparison: Evaluate an untrained (randomly initialized)
+      model against classical AMG to demonstrate that RL training improves
+      edge selection quality. Uses same test set as Variation A for comparison.
+    use_random_init: true  # Skip training, use random weights
+    train:
+      grid_size: 2
+      num_samples: 1  # Not used (random init)
+      seed: 42
+      epochs: 1  # Not used
+      batch_size: 1
+      learning_rate: 0.001
+      model_config: configs/model/gat_default.yaml
+    test:
+      grid_size: 256
+      num_samples: 50
+      seed: 12345  # Same as Variation A for comparison
+      scaling_study: false
+      collect_wall_time: true
+      collect_energy_history: true
+      collect_iterations: true
+      collect_spectral: true
+
+output_dir: case_studies/results/study_1_anisotropic

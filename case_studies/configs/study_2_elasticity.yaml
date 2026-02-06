@@ -1,0 +1,143 @@
+# Case Study 2: Linear Elasticity Problems
+# Tests learned preconditioner on Navier-Cauchy equations
+# with varying material properties (Young's modulus E, Poisson ratio ν)
+
+name: "elasticity_study"
+description: |
+  Evaluates learned AMG preconditioners on linear elasticity problems.
+  Parameters vary Young's modulus and Poisson's ratio to span
+  from nearly incompressible to highly compressible materials.
+
+problem:
+  type: elasticity
+  parameters:
+    # Young's modulus (stiffness)
+    E:
+      min: 1000.0       # Soft material (rubber-like)
+      max: 1000000.0    # Stiff material (steel-like)  
+      log_scale: true   # Log-uniform sampling
+    
+    # Poisson's ratio (incompressibility)
+    nu:
+      min: 0.1          # Highly compressible
+      max: 0.499        # Nearly incompressible (avoid 0.5 singularity)
+
+# ============================================================================
+# Variation A: Same Grid Train/Test
+# ============================================================================
+variations:
+  A:
+    description: "Fixed grid size, vary material parameters"
+    
+    train:
+      grid_size: 32          # Single grid size
+      num_samples: 200      # 200 training samples
+      seed: 42
+    
+    test:
+      grid_size: 32          # Same grid as training
+      num_samples: 50      # 50 unseen parameters
+      ensure_no_overlap: true   # Different E, nu combos
+      seed: 12345               # Different seed for test
+
+  # ============================================================================
+  # Variation B: Scaling Study
+  # ============================================================================
+  B:
+    description: "Train small, test across grid sizes"
+    
+    train:
+      grid_sizes: [32, 48, 64]   # Train on small grids
+      samples_per_size: 30       # 90 total training samples
+      seed: 42
+    
+    test:
+      grid_sizes: [32, 64, 100, 150, 200, 256]
+      samples_per_size: 10       # Fewer samples per size (elasticity is expensive)
+      ensure_no_overlap: true
+      seed: 54321
+
+  # ============================================================================
+  # Variation C: Reverse Scaling (Large → Small)
+  # ============================================================================
+  C:
+    description: "Train large, test small (test generalization)"
+    
+    train:
+      grid_sizes: [128, 160, 200]  # Train on larger grids
+      samples_per_size: 20         # 60 total (memory constrained)
+      seed: 42
+    
+    test:
+      grid_sizes: [32, 48, 64, 80, 100]  # Test on smaller grids
+      samples_per_size: 15
+      ensure_no_overlap: true
+      seed: 99999
+
+# ============================================================================
+# Training hyperparameters (shared across variations)
+# ============================================================================
+training:
+  epochs: 50
+  learning_rate: 5.0e-4         # Lower LR for stability
+  batch_size: 16                # Larger batch for faster training
+  reward_type: "vcycle"
+  
+  # AMG hierarchy settings
+  # max_levels: -1 = no limit (PyAMG decides based on max_coarse)
+  #             2  = two-grid (fine + coarse only)
+  #             3+ = multilevel hierarchy
+  max_levels: -1                 
+  max_coarse: 50                # Stop coarsening when grid < this size
+  
+  # Entropy regularization - CRITICAL for avoiding plateau
+  entropy_coef: 0.05            # Higher = more exploration (default 0.01)
+  
+  # Temperature annealing - slower decay keeps exploration alive
+  temperature:
+    initial: 1.0                # Start higher
+    anneal: true
+    anneal_factor: 0.995        # Much slower decay (default 0.97)
+    min_temperature: 0.3        # Lower floor allows more exploitation later
+  
+  # Early stopping
+  patience: 15
+  min_delta: 0.001
+
+# ============================================================================
+# Evaluation settings
+# ============================================================================
+evaluation:
+  pcg_tol: 1.0e-8
+  pcg_maxiter: 500              # More iterations allowed
+  vcycle_iters: 30
+  
+  # Solver configurations for comparison
+  solvers:
+    - name: "learned"
+      type: "learned"
+    - name: "baseline_SA"
+      type: "pyamg"
+      method: "smoothed_aggregation"
+      theta: 0.25
+    - name: "baseline_RS"
+      type: "pyamg"  
+      method: "ruge_stuben"
+      theta: 0.25
+
+# ============================================================================
+# Output settings
+# ============================================================================
+output:
+  save_checkpoints: true
+  save_configs: true
+  save_plots: true
+  save_tensorboard: true
+  
+  metrics:
+    - iterations
+    - wall_time
+    - energy_history
+    - residual_history
+    - eigenvalue_bounds
+    - condition_number
