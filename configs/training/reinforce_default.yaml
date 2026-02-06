@@ -30,7 +30,9 @@ temperature:
 
 # Sampling strategy
 sampling:
-  k_per_row: 3  # Number of strong edges to select per node
+
+  # TODO: why can't this be ML as well?
+  k_per_row: 5  # Number of strong edges to select per node. TODO: why can't this be ML as well?
   method: topk_without_replacement  # topk_without_replacement, gumbel_softmax
   gumbel: true
 
@@ -57,13 +59,22 @@ reward:
 
 # Baseline for variance reduction
 baseline:
-  type: moving_average  # moving_average, value_network, none
-  momentum: 0.95  # For moving_average
+  type: exponential_moving  # moving_average, exponential_moving
+  momentum: 0.95  # For mean EMA
+  var_momentum: 0.99  # For variance EMA (exponential_moving only)
+  normalize: true  # Normalize advantages by std (exponential_moving only)
+  clip: 10.0  # Clip normalized advantages (exponential_moving only)
+  warmup_steps: 100  # Use simple stats during warmup (exponential_moving only)
   
-  # Value network baseline (if type: value_network)
+  # Value network baseline (if type: value_network) - not yet implemented
   value_network:
     hidden_dim: 64
     lr: 0.001
+
+# Entropy coefficient for exploration bonus
+# Higher = more exploration, Lower = more exploitation
+# Recommended: 0.01-0.1
+entropy_coef: 0.01
 
 # Logging and checkpointing
 logging:
