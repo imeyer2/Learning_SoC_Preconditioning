@@ -92,6 +92,10 @@ entropy_coef: 0.01
 parallel_workers: 1  # Number of parallel workers (1 = sequential)
 parallel_batch_size: 8  # Batch size for parallel training
 
+# Timing profiling
+# Prints breakdown of time spent in each training phase after each epoch
+timing_enabled: true  # Set to false to disable timing output
+
 # Logging and checkpointing
 logging:
   log_interval: 1  # Log every N steps
