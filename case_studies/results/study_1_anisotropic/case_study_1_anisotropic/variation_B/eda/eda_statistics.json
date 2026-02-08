@@ -1,54 +1,54 @@
 {
   "iterations": {
     "learned": {
-      "mean": 23.5,
-      "std": 11.3194522835692,
-      "median": 21.0,
-      "min": 8,
-      "max": 55
+      "mean": 43.32,
+      "std": 35.86610656316072,
+      "median": 27.0,
+      "min": 12,
+      "max": 154
     },
     "baseline": {
-      "mean": 34.94,
-      "std": 21.701069098088233,
-      "median": 27.0,
-      "min": 9,
-      "max": 101
+      "mean": 41.98,
+      "std": 34.341514235688564,
+      "median": 27.5,
+      "min": 12,
+      "max": 151
     },
     "improvement": {
-      "mean_reduction": 11.439999999999998,
-      "win_rate": 0.98
+      "mean_reduction": -1.3400000000000034,
+      "win_rate": 0.46
     }
   },
   "speedup": {
-    "mean": 0.2569726888294235,
-    "std": 0.16841882095138752,
-    "median": 0.21252416521328638,
-    "min": 0.04535503719006716,
-    "max": 0.6218553838143266,
+    "mean": 0.4349048487303838,
+    "std": 0.14637951034758845,
+    "median": 0.41203205856610803,
+    "min": 0.19948141807735195,
+    "max": 0.7496537529334821,
     "pct_above_1": 0.0,
     "pct_above_1_5": 0.0,
     "pct_above_2": 0.0
   },
   "correlations": {
     "correlations": {
-      "theta": -0.06138545269644219,
-      "epsilon": -0.23299584570793938
+      "theta": -0.03474951238948164,
+      "epsilon": -0.38012462173193096
     }
   },
   "summary": {
     "n_problems": 50,
     "learned": {
-      "iterations_mean": 23.5,
-      "iterations_std": 11.3194522835692,
-      "time_mean": 13.413298630714417,
-      "convergence_rate_mean": 0.4032831439339261
+      "iterations_mean": 43.32,
+      "iterations_std": 35.86610656316072,
+      "time_mean": 3.3060839891433718,
+      "convergence_rate_mean": 0.5379632768326815
     },
     "baseline": {
-      "iterations_mean": 34.94,
-      "iterations_std": 21.701069098088233,
-      "time_mean": 1.547511806488037,
-      "convergence_rate_mean": 0.5073359019351805
+      "iterations_mean": 41.98,
+      "iterations_std": 34.341514235688564,
+      "time_mean": 1.0993694591522216,
+      "convergence_rate_mean": 0.522758893887055
     },
-    "win_rate": 0.98
+    "win_rate": 0.46
   }
 }

@@ -2,11 +2,13 @@
 Edge sampling strategies for policy network.
 
 Implements stochastic sampling of edges per row for building C matrix.
+Supports both fixed k (same for all nodes) and per-node k values.
 """
 
-from typing import List, Tuple
+from typing import List, Tuple, Union, Optional
 import torch
 import torch.nn.functional as F
+import numpy as np
 
 
 def build_row_groups(edge_index: torch.Tensor, num_nodes: int) -> List[torch.Tensor]:
@@ -32,7 +34,7 @@ def build_row_groups(edge_index: torch.Tensor, num_nodes: int) -> List[torch.Ten
 def sample_topk_without_replacement(
     logits: torch.Tensor,
     row_groups: List[torch.Tensor],
-    k: int,
+    k: Union[int, torch.Tensor],
     temperature: float = 1.0,
     gumbel: bool = True,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
@@ -40,14 +42,16 @@ def sample_topk_without_replacement(
     Sample up to k edges per row without replacement using Gumbel-Softmax trick.
     
     For each node i:
-      - Sample k edges from its outgoing edges sequentially
+      - Sample k (or k[i] if per-node) edges from its outgoing edges sequentially
       - Remove sampled edges from pool (without replacement)
       - Track log probabilities for REINFORCE
     
     Args:
         logits: (E,) edge logits from policy
         row_groups: List of edge indices per node
-        k: Number of edges to sample per row
+        k: Number of edges to sample per row. Can be:
+           - int: same k for all nodes
+           - Tensor (N,): per-node k values
         temperature: Temperature for softmax
         gumbel: Whether to use Gumbel noise for sampling
         
@@ -62,7 +66,14 @@ def sample_topk_without_replacement(
     
     tau = max(float(temperature), 1e-6)
     
-    for edges_i in row_groups:
+    # Handle per-node k values
+    is_per_node_k = isinstance(k, torch.Tensor)
+    if is_per_node_k:
+        k_values = k.cpu().numpy().astype(int)
+    else:
+        k_fixed = int(k)
+    
+    for node_idx, edges_i in enumerate(row_groups):
         if edges_i.numel() and int(edges_i.max()) >= E:
             raise RuntimeError(
                 f"row_groups contain edge id {int(edges_i.max())} but logits has E={E}"
@@ -72,8 +83,14 @@ def sample_topk_without_replacement(
         
         edges_i = edges_i.to(device)
         
+        # Get k for this node
+        if is_per_node_k:
+            k_this_node = int(k_values[node_idx])
+        else:
+            k_this_node = k_fixed
+        
         # Number to sample in this row
-        kk = min(k, edges_i.numel())
+        kk = min(k_this_node, edges_i.numel())
         if kk <= 0:
             continue
         
@@ -121,7 +138,7 @@ def sample_topk_without_replacement(
 def sample_deterministic_topk(
     logits: torch.Tensor,
     row_groups: List[torch.Tensor],
-    k: int,
+    k: Union[int, torch.Tensor],
 ) -> torch.Tensor:
     """
     Deterministically select top-k edges per row by logit value.
@@ -131,24 +148,38 @@ def sample_deterministic_topk(
     Args:
         logits: (E,) edge logits from policy
         row_groups: List of edge indices per node
-        k: Number of edges to select per row
+        k: Number of edges to select per row. Can be:
+           - int: same k for all nodes
+           - Tensor (N,): per-node k values
         
     Returns:
         selected_mask: (E,) bool tensor indicating selected edges
     """
-    import numpy as np
-    
     device = logits.device
     E = logits.numel()
     selected = np.zeros(E, dtype=bool)
     logits_np = logits.cpu().numpy()
     
-    for edges_i in row_groups:
+    # Handle per-node k values
+    is_per_node_k = isinstance(k, torch.Tensor)
+    if is_per_node_k:
+        k_values = k.cpu().numpy().astype(int)
+    else:
+        k_fixed = int(k)
+    
+    for node_idx, edges_i in enumerate(row_groups):
         if edges_i.numel() == 0:
             continue
         
         edges = edges_i.numpy()
-        kk = min(k, edges.shape[0])
+        
+        # Get k for this node
+        if is_per_node_k:
+            k_this_node = int(k_values[node_idx])
+        else:
+            k_this_node = k_fixed
+        
+        kk = min(k_this_node, edges.shape[0])
         if kk <= 0:
             continue
         

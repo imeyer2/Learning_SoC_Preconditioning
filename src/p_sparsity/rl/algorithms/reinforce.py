@@ -2,7 +2,7 @@
 REINFORCE training algorithm for AMG policy learning.
 """
 
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import numpy as np
 import torch
 import torch.nn as nn
@@ -16,7 +16,8 @@ from ...pyamg_interface import (
     build_pyamg_solver,
 )
 from ..rewards import get_reward_function
-from ..baselines import MovingAverageBaseline
+from ..baselines import MovingAverageBaseline, ExponentialMovingBaseline
+from ...utils.diagnostics import TrainingDiagnostics, compute_policy_entropy
 
 
 class ReinforceTrainer:
@@ -54,14 +55,27 @@ class ReinforceTrainer:
         # Setup optimizer
         self.optimizer = self._build_optimizer()
         
-        # Setup baseline
+        # Setup baseline with normalization for better variance reduction
         baseline_config = config.baseline
-        if baseline_config.type == "moving_average":
-            self.baseline = MovingAverageBaseline(
-                momentum=baseline_config.momentum
+        baseline_type = getattr(baseline_config, 'type', 'moving_average')
+        
+        if baseline_type == "exponential_moving":
+            # Better baseline with normalization
+            self.baseline = ExponentialMovingBaseline(
+                momentum=getattr(baseline_config, 'momentum', 0.95),
+                var_momentum=getattr(baseline_config, 'var_momentum', 0.99),
+                normalize=getattr(baseline_config, 'normalize', True),
+                clip=getattr(baseline_config, 'clip', 10.0),
+                warmup_steps=getattr(baseline_config, 'warmup_steps', 100),
             )
         else:
-            self.baseline = MovingAverageBaseline(momentum=0.95)
+            # Simple moving average (original)
+            self.baseline = MovingAverageBaseline(
+                momentum=getattr(baseline_config, 'momentum', 0.95)
+            )
+        
+        # Entropy coefficient for exploration bonus
+        self.entropy_coef = getattr(config, 'entropy_coef', 0.01)
         
         # Get reward function
         reward_config = config.reward
@@ -70,6 +84,10 @@ class ReinforceTrainer:
         # Training state
         self.step = 0
         self.best_reward = float('-inf')
+        
+        # Diagnostics (detailed training metrics)
+        self.diagnostics = TrainingDiagnostics()
+        self.enable_diagnostics = getattr(config, 'enable_diagnostics', True)
         
         # History
         self.history = {
@@ -118,11 +136,27 @@ class ReinforceTrainer:
             
             epoch_rewards = []
             
+            # Start diagnostic collection for this epoch
+            if self.enable_diagnostics:
+                self.diagnostics.start_epoch(epoch + 1)
+            
             # Training loop
             pbar = tqdm(self.train_data, desc=f"Epoch {epoch+1}/{self.config.epochs}")
             for sample in pbar:
-                reward, loss = self._train_step(sample, temperature)
+                reward, loss, step_info = self._train_step(sample, temperature)
                 epoch_rewards.append(reward)
+                
+                # Record diagnostics for this step
+                if self.enable_diagnostics and step_info is not None:
+                    self.diagnostics.record_step(
+                        logits=step_info['logits'],
+                        actions=step_info['selected_edges'],
+                        reward=reward,
+                        baseline=step_info['baseline'],
+                        num_total_edges=step_info['num_total_edges'],
+                        attention_weights=step_info.get('attention_weights'),
+                        node_embeddings=step_info.get('node_embeddings'),
+                    )
                 
                 # Update progress bar
                 pbar.set_postfix({
@@ -141,6 +175,15 @@ class ReinforceTrainer:
             # Log to TensorBoard
             self.tb_logger.log_scalar("train/epoch_mean_reward", mean_reward, epoch)
             self.tb_logger.log_scalar("train/temperature", temperature, epoch)
+            
+            # End epoch diagnostics and log detailed metrics
+            if self.enable_diagnostics:
+                self.diagnostics.end_epoch(self.model, compute_expensive=True)
+                self._log_diagnostics_to_tensorboard(epoch)
+                
+                # Print epoch diagnostic summary every 10 epochs
+                if (epoch + 1) % 10 == 0 or epoch == 0:
+                    self.diagnostics.print_epoch_summary()
             
             # Save checkpoint if best
             if mean_reward > self.best_reward:
@@ -173,7 +216,57 @@ class ReinforceTrainer:
         print(f"Best Reward: {self.best_reward:.4f}")
         print("=" * 80)
         
+        # Save and plot diagnostics
+        if self.enable_diagnostics and hasattr(self.experiment, 'experiment_dir'):
+            self._save_diagnostics()
+        
         return self.history
+    
+    def _log_diagnostics_to_tensorboard(self, epoch: int):
+        """Log detailed diagnostics to TensorBoard."""
+        if not self.diagnostics.epochs:
+            return
+        
+        e = self.diagnostics.epochs[-1]
+        
+        # RL Metrics
+        self.tb_logger.log_scalar("diagnostics/policy_entropy", e.policy_entropy, epoch)
+        self.tb_logger.log_scalar("diagnostics/advantage_mean", e.advantage_mean, epoch)
+        self.tb_logger.log_scalar("diagnostics/advantage_std", e.advantage_std, epoch)
+        self.tb_logger.log_scalar("diagnostics/value_explained_var", e.value_explained_var, epoch)
+        
+        # Gradient Metrics
+        self.tb_logger.log_scalar("diagnostics/grad_norm_total", e.grad_norm_total, epoch)
+        self.tb_logger.log_scalar("diagnostics/grad_norm_gnn", e.grad_norm_gnn, epoch)
+        self.tb_logger.log_scalar("diagnostics/grad_norm_policy", e.grad_norm_policy, epoch)
+        self.tb_logger.log_scalar("diagnostics/grad_max", e.grad_max, epoch)
+        
+        # GNN/Problem Metrics
+        self.tb_logger.log_scalar("diagnostics/sparsity_ratio", e.sparsity_ratio, epoch)
+        self.tb_logger.log_scalar("diagnostics/reward_variance", e.reward_variance, epoch)
+        
+        # Gradient health indicator (ratio of GNN to policy gradients)
+        if e.grad_norm_policy > 1e-10:
+            grad_ratio = e.grad_norm_gnn / e.grad_norm_policy
+            self.tb_logger.log_scalar("diagnostics/grad_ratio_gnn_policy", grad_ratio, epoch)
+    
+    def _save_diagnostics(self):
+        """Save diagnostics JSON and generate plots."""
+        from pathlib import Path
+        
+        exp_dir = Path(self.experiment.experiment_dir)
+        diagnostics_dir = exp_dir / "diagnostics"
+        diagnostics_dir.mkdir(exist_ok=True)
+        
+        # Save JSON
+        self.diagnostics.save(str(diagnostics_dir / "training_diagnostics.json"))
+        
+        # Generate plots
+        try:
+            self.diagnostics.plot_all(str(diagnostics_dir / "plots"))
+            print(f"\n📊 Diagnostic plots saved to: {diagnostics_dir / 'plots'}")
+        except Exception as e:
+            print(f"Warning: Could not generate diagnostic plots: {e}")
     
     def _train_step(self, sample: TrainSample, temperature: float) -> tuple:
         """
@@ -186,6 +279,7 @@ class ReinforceTrainer:
         Returns:
             reward: Reward value
             loss: Loss value
+            step_info: Dict with diagnostic info (logits, selected edges, etc.)
         """
         self.step += 1
         
@@ -194,14 +288,45 @@ class ReinforceTrainer:
         ei = sample.edge_index.to(self.config.device)
         ew = sample.edge_weight.to(self.config.device)
         
-        # Forward pass: get logits and B candidates
-        logits, B_extra = self.model(x, ei, ew)
+        # Forward pass: get logits, B candidates, and optionally k values
+        # Optionally collect internals for diagnostics (every N steps to reduce overhead)
+        collect_internals = self.enable_diagnostics and (self.step % 10 == 0)
+        
+        # Check if model uses new dict-based forward
+        output = self.model(x, ei, ew, return_internals=collect_internals)
+        
+        # Handle both dict-based and legacy tuple-based returns
+        if isinstance(output, dict):
+            logits = output['edge_logits']
+            B_extra = output['B_extra']
+            k_per_node = output.get('k_per_node')  # None if learn_k=False
+            k_continuous = output.get('k_continuous')  # For loss if needed
+            internals = output.get('internals', {})
+        else:
+            # Legacy tuple return
+            if collect_internals and len(output) == 3:
+                logits, B_extra, internals = output
+            else:
+                logits, B_extra = output[:2]
+                internals = {}
+            k_per_node = None
+            k_continuous = None
+        
+        # Store logits for diagnostics (before sampling modifies them)
+        logits_for_diag = logits.detach().clone()
+        
+        # Determine k values to use for sampling
+        learnable_k = self.config.sampling.get("learnable_k", False)
+        if learnable_k and k_per_node is not None:
+            k_to_use = k_per_node
+        else:
+            k_to_use = self.config.sampling.k_per_row
         
         # Sample edges from policy
         selected_mask_t, logp_sum = sample_topk_without_replacement(
             logits=logits,
             row_groups=sample.row_groups,
-            k=self.config.sampling.k_per_row,
+            k=k_to_use,
             temperature=temperature,
             gumbel=self.config.sampling.get("gumbel", True),
         )
@@ -210,6 +335,9 @@ class ReinforceTrainer:
         selected_mask = selected_mask_t.detach().cpu().numpy()
         C = C_from_selected_edges(sample.A, sample.edge_index, selected_mask)
         B = build_B_for_pyamg(B_extra)
+        
+        # Track selected edges for diagnostics
+        selected_edges = np.where(selected_mask)[0]
         
         try:
             ml = build_pyamg_solver(
@@ -228,11 +356,21 @@ class ReinforceTrainer:
         # Update baseline and compute advantage
         advantage = self.baseline.update(R)
         
-        # REINFORCE loss: -advantage * logprob
-        loss = -(
+        # Compute policy entropy for exploration bonus
+        # H(π) = -Σ p(a) log p(a)
+        with torch.no_grad():
+            probs = torch.softmax(logits_for_diag / temperature, dim=-1)
+            log_probs = torch.log_softmax(logits_for_diag / temperature, dim=-1)
+            entropy = -torch.sum(probs * log_probs, dim=-1).mean()
+        
+        # REINFORCE loss: -advantage * logprob - entropy_coef * entropy
+        # Entropy bonus encourages exploration (negative because we minimize loss)
+        policy_loss = -(
             torch.tensor(advantage, device=self.config.device, dtype=torch.float32)
             * logp_sum
         )
+        entropy_bonus = -self.entropy_coef * entropy
+        loss = policy_loss + entropy_bonus
         
         # Backpropagation
         self.optimizer.zero_grad()
@@ -253,6 +391,22 @@ class ReinforceTrainer:
             self.tb_logger.log_scalar("train/baseline", self.baseline.get_baseline(), self.step)
             self.tb_logger.log_scalar("train/advantage", advantage, self.step)
             self.tb_logger.log_scalar("train/loss", float(loss.detach().cpu().item()), self.step)
+            self.tb_logger.log_scalar("train/entropy", float(entropy.item()), self.step)
+            
+            # Log baseline std if available
+            if hasattr(self.baseline, 'get_std'):
+                self.tb_logger.log_scalar("train/baseline_std", self.baseline.get_std(), self.step)
+            
+            # Log k statistics if learnable_k is enabled
+            if learnable_k and k_per_node is not None:
+                k_mean = float(k_per_node.float().mean().item())
+                k_std = float(k_per_node.float().std().item())
+                k_min_val = float(k_per_node.min().item())
+                k_max_val = float(k_per_node.max().item())
+                self.tb_logger.log_scalar("train/k_mean", k_mean, self.step)
+                self.tb_logger.log_scalar("train/k_std", k_std, self.step)
+                self.tb_logger.log_scalar("train/k_min", k_min_val, self.step)
+                self.tb_logger.log_scalar("train/k_max", k_max_val, self.step)
         
         # Store in history
         self.history["train_reward"].append(R)
@@ -260,4 +414,14 @@ class ReinforceTrainer:
         self.history["advantage"].append(advantage)
         self.history["loss"].append(float(loss.detach().cpu().item()))
         
-        return R, float(loss.detach().cpu().item())
+        # Prepare diagnostic info
+        step_info = {
+            'logits': logits_for_diag,
+            'selected_edges': selected_edges,
+            'baseline': self.baseline.get_baseline(),
+            'num_total_edges': sample.edge_index.shape[1] if sample.edge_index.dim() > 1 else len(sample.edge_index),
+            'attention_weights': internals.get('attention_weights'),
+            'node_embeddings': internals.get('node_embeddings'),
+        }
+        
+        return R, float(loss.detach().cpu().item()), step_info

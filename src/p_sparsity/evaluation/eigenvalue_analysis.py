@@ -227,11 +227,17 @@ def compare_spectral_properties(
     Returns:
         dict with comparison statistics
     """
+    print(f"  Spectral analysis method: {method}")
+    
     # Choose analysis method
     if method == 'fast':
         # Fast convergence-based estimation (cheap for large problems)
+        print("  → Estimating learned solver convergence...", end=" ", flush=True)
         eig_learned = estimate_spectral_properties_from_vcycle(A, ml_learned, num_vecs=10, max_iters=15)
+        print("done")
+        print("  → Estimating baseline solver convergence...", end=" ", flush=True)
         eig_baseline = estimate_spectral_properties_from_vcycle(A, ml_baseline, num_vecs=10, max_iters=15)
+        print("done")
         # Estimate bounds from convergence factors
         cg_bound_learned = eig_learned.spectral_radius
         rich_bound_learned = eig_learned.spectral_radius
@@ -239,11 +245,15 @@ def compare_spectral_properties(
         rich_bound_baseline = eig_baseline.spectral_radius
     else:
         # Full eigenvalue analysis (expensive but accurate)
+        print(f"  → Computing {k} eigenvalues for learned solver...", end=" ", flush=True)
         eig_learned = run_eigenvalue_analysis(A, ml_learned, k=k)
+        print("done")
         cg_bound_learned, rich_bound_learned = compute_convergence_factor_bound(
             A, ml_learned, k=k
         )
+        print(f"  → Computing {k} eigenvalues for baseline solver...", end=" ", flush=True)
         eig_baseline = run_eigenvalue_analysis(A, ml_baseline, k=k)
+        print("done")
         cg_bound_baseline, rich_bound_baseline = compute_convergence_factor_bound(
             A, ml_baseline, k=k
         )
@@ -258,6 +268,7 @@ def compare_spectral_properties(
             'cg_convergence_bound': cg_bound_learned,
             'richardson_bound': rich_bound_learned,
             'metric_type': metric_name,
+            'eigenvalues': eig_learned.eigenvalues,  # Include eigenvalues for plotting
         },
         'baseline': {
             'condition_number': eig_baseline.condition_number,
@@ -265,6 +276,7 @@ def compare_spectral_properties(
             'cg_convergence_bound': cg_bound_baseline,
             'richardson_bound': rich_bound_baseline,
             'metric_type': metric_name,
+            'eigenvalues': eig_baseline.eigenvalues,  # Include eigenvalues for plotting
         }
     }
     

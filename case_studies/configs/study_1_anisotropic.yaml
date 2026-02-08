@@ -31,15 +31,15 @@ variations:
       Train on 32x32 grid with 30 samples, test on 32x32 with 50 different samples.
       Tests within-distribution generalization.
     train:
-      grid_size: 32
-      num_samples: 200
+      grid_size: 128
+      num_samples: 30
       seed: 42
       epochs: 50
       batch_size: 2
       learning_rate: 0.001
       model_config: configs/model/gat_default.yaml
     test:
-      grid_size: 32
+      grid_size: 128
       num_samples: 50
       seed: 12345  # Different from train
       scaling_study: false
@@ -107,10 +107,11 @@ variations:
   # Variation D: Random baseline (ablation study)
   D:
     description: |
-      Random baseline comparison: Evaluate an untrained (randomly initialized)
-      model against classical AMG to demonstrate that RL training improves
-      edge selection quality. Uses same test set as Variation A for comparison.
-    use_random_init: true  # Skip training, use random weights
+      4-way ablation study: Compare trained model, random model, baseline AMG, and tuned AMG.
+      This demonstrates that RL training improves edge selection quality beyond random initialization.
+      Uses same test set as Variation A for fair comparison.
+    use_random_init: true  # Primary model is random (untrained)
+    compare_with_trained: case_studies/results/study_1_anisotropic/case_study_1_anisotropic/variation_A/checkpoints/best_model.pt
     train:
       grid_size: 2
       num_samples: 1  # Not used (random init)
@@ -120,7 +121,7 @@ variations:
       learning_rate: 0.001
       model_config: configs/model/gat_default.yaml
     test:
-      grid_size: 256
+      grid_size: 128
       num_samples: 50
       seed: 12345  # Same as Variation A for comparison
       scaling_study: false

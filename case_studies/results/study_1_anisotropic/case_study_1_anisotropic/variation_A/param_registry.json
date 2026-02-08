@@ -3,1605 +3,245 @@
   "train_params": [
     {
       "params": {
-        "theta": 1.255227377875699,
-        "epsilon": 0.1480157656202887
+        "theta": 2.883452717125864,
+        "epsilon": 0.03427799634270199
       },
-      "grid_size": 32,
-      "hash": "d86ae6e07f0e3135"
-    },
-    {
-      "params": {
-        "theta": 4.617469694030584,
-        "epsilon": 0.0035179035281993356
-      },
-      "grid_size": 32,
-      "hash": "ac12210e5d62fb5d"
-    },
-    {
-      "params": {
-        "theta": 4.133476724617369,
-        "epsilon": 0.013483767251810393
-      },
-      "grid_size": 32,
-      "hash": "c7eec6f823e635b2"
-    },
-    {
-      "params": {
-        "theta": 5.8623575106101224,
-        "epsilon": 0.14823337059536115
-      },
-      "grid_size": 32,
-      "hash": "518a1a66ff92e9b3"
-    },
-    {
-      "params": {
-        "theta": 2.881142429335429,
-        "epsilon": 0.015624011914059082
-      },
-      "grid_size": 32,
-      "hash": "cbeeff5b7265d309"
-    },
-    {
-      "params": {
-        "theta": 4.902778642009084,
-        "epsilon": 0.019669987075722897
-      },
-      "grid_size": 32,
-      "hash": "59f5caf70aceca25"
-    },
-    {
-      "params": {
-        "theta": 5.054142667479657,
-        "epsilon": 0.027403210307772728
-      },
-      "grid_size": 32,
-      "hash": "c2d13f80419a45b5"
-    },
-    {
-      "params": {
-        "theta": 1.9926423343002926,
-        "epsilon": 0.37311858731810693
-      },
-      "grid_size": 32,
-      "hash": "db15faec4f48ea04"
-    },
-    {
-      "params": {
-        "theta": 5.3947295714184,
-        "epsilon": 0.07623868423300403
-      },
-      "grid_size": 32,
-      "hash": "dc04da427c1202f3"
-    },
-    {
-      "params": {
-        "theta": 5.8280471070458235,
-        "epsilon": 0.011831821784114453
-      },
-      "grid_size": 32,
-      "hash": "8eab82658aa2d1ce"
-    },
-    {
-      "params": {
-        "theta": 4.199699463477464,
-        "epsilon": 0.018684200951110758
-      },
-      "grid_size": 32,
-      "hash": "5a1b2bf87ff3280a"
-    },
-    {
-      "params": {
-        "theta": 5.388284432368692,
-        "epsilon": 0.017745228898909896
-      },
-      "grid_size": 32,
-      "hash": "95e95d963bb3388f"
-    },
-    {
-      "params": {
-        "theta": 2.0833093505677636,
-        "epsilon": 0.025426067544172953
-      },
-      "grid_size": 32,
-      "hash": "017b46a616c365c9"
-    },
-    {
-      "params": {
-        "theta": 4.509820348454553,
-        "epsilon": 0.36918653722241185
-      },
-      "grid_size": 32,
-      "hash": "62445e665e281a43"
-    },
-    {
-      "params": {
-        "theta": 3.4845588150060878,
-        "epsilon": 0.0014867599716649842
-      },
-      "grid_size": 32,
-      "hash": "1102425757c98511"
-    },
-    {
-      "params": {
-        "theta": 5.2001597653962115,
-        "epsilon": 0.050680777174435476
-      },
-      "grid_size": 32,
-      "hash": "7cff9caa4fb53168"
-    },
-    {
-      "params": {
-        "theta": 3.551483025701008,
-        "epsilon": 0.1160670561772317
-      },
-      "grid_size": 32,
-      "hash": "0bbd8203aa5790cf"
-    },
-    {
-      "params": {
-        "theta": 1.4875118229500743,
-        "epsilon": 0.00471074490010844
-      },
-      "grid_size": 32,
-      "hash": "b4bcf2123572b4c9"
-    },
-    {
-      "params": {
-        "theta": 3.2600830671047305,
-        "epsilon": 0.007123329510750992
-      },
-      "grid_size": 32,
-      "hash": "9e1916a7090e92ac"
-    },
-    {
-      "params": {
-        "theta": 5.229242300229306,
-        "epsilon": 0.14860549252653657
-      },
-      "grid_size": 32,
-      "hash": "5347400eb213ab68"
-    },
-    {
-      "params": {
-        "theta": 4.894578210139981,
-        "epsilon": 0.0023075566652119256
-      },
-      "grid_size": 32,
-      "hash": "8b25414338cd39cd"
-    },
-    {
-      "params": {
-        "theta": 4.763205517188319,
-        "epsilon": 0.009054301536060688
-      },
-      "grid_size": 32,
-      "hash": "cf5fdd07b8550c50"
-    },
-    {
-      "params": {
-        "theta": 0.8234600987186372,
-        "epsilon": 0.0021577831826921036
-      },
-      "grid_size": 32,
-      "hash": "ced38db821589418"
-    },
-    {
-      "params": {
-        "theta": 3.002591319986889,
-        "epsilon": 0.013340493665551147
-      },
-      "grid_size": 32,
-      "hash": "d90849fcd0b5cee8"
-    },
-    {
-      "params": {
-        "theta": 2.3510675687753593,
-        "epsilon": 0.01410726993801579
-      },
-      "grid_size": 32,
-      "hash": "4f883aeac99a3ceb"
-    },
-    {
-      "params": {
-        "theta": 1.865329811879181,
-        "epsilon": 0.3638639942399801
-      },
-      "grid_size": 32,
-      "hash": "7ce38cf8aab8c23f"
-    },
-    {
-      "params": {
-        "theta": 4.782381558450256,
-        "epsilon": 0.13230126033997305
-      },
-      "grid_size": 32,
-      "hash": "f9e4e649bf7b3b16"
-    },
-    {
-      "params": {
-        "theta": 3.789433844383321,
-        "epsilon": 0.012987282580181442
-      },
-      "grid_size": 32,
-      "hash": "ce91f03943a5ed97"
-    },
-    {
-      "params": {
-        "theta": 1.0342613703140726,
-        "epsilon": 0.0013219420415532556
-      },
-      "grid_size": 32,
-      "hash": "f008e479c74723d7"
-    },
-    {
-      "params": {
-        "theta": 1.8909163059676237,
-        "epsilon": 0.020829252419062964
-      },
-      "grid_size": 32,
-      "hash": "251d45adf2bf374e"
-    },
-    {
-      "params": {
-        "theta": 0.5917336995874611,
-        "epsilon": 0.4297100021154879
-      },
-      "grid_size": 32,
-      "hash": "adde3b5add670166"
-    },
-    {
-      "params": {
-        "theta": 1.6082760175780029,
-        "epsilon": 0.33601101793618193
-      },
-      "grid_size": 32,
-      "hash": "d7661bda1fd5a8aa"
-    },
-    {
-      "params": {
-        "theta": 3.474557732701042,
-        "epsilon": 0.336212413569848
-      },
-      "grid_size": 32,
-      "hash": "dc45250c9e68ec5a"
-    },
-    {
-      "params": {
-        "theta": 4.1740048718819365,
-        "epsilon": 0.012497580682773846
-      },
-      "grid_size": 32,
-      "hash": "ab893db9b7d896c8"
-    },
-    {
-      "params": {
-        "theta": 3.6961338415366076,
-        "epsilon": 0.07108099680418599
-      },
-      "grid_size": 32,
-      "hash": "f29c596bf551f46a"
-    },
-    {
-      "params": {
-        "theta": 4.865204707081187,
-        "epsilon": 0.0648087209628591
-      },
-      "grid_size": 32,
-      "hash": "5dcede88f100ff73"
-    },
-    {
-      "params": {
-        "theta": 5.886170335236583,
-        "epsilon": 0.004470667323747008
-      },
-      "grid_size": 32,
-      "hash": "f95ad798332dfcb5"
-    },
-    {
-      "params": {
-        "theta": 6.071013856899357,
-        "epsilon": 0.040616357450376846
-      },
-      "grid_size": 32,
-      "hash": "b5e09ede8ffa03ae"
-    },
-    {
-      "params": {
-        "theta": 0.8282633814630022,
-        "epsilon": 0.06744976381390114
-      },
-      "grid_size": 32,
-      "hash": "d0c1638e8b2e334f"
-    },
-    {
-      "params": {
-        "theta": 4.884578418564393,
-        "epsilon": 0.41969169309426024
-      },
-      "grid_size": 32,
-      "hash": "301e81d1a0ffec67"
-    },
-    {
-      "params": {
-        "theta": 3.146249510028764,
-        "epsilon": 0.002445541533992166
-      },
-      "grid_size": 32,
-      "hash": "82bad7e78f075c6f"
-    },
-    {
-      "params": {
-        "theta": 5.602573224173881,
-        "epsilon": 0.10482638026125977
-      },
-      "grid_size": 32,
-      "hash": "5211b3c29cc1fd11"
-    },
-    {
-      "params": {
-        "theta": 0.9631137189502715,
-        "epsilon": 0.0030467708122559807
-      },
-      "grid_size": 32,
-      "hash": "aae1d514d49d7d81"
-    },
-    {
-      "params": {
-        "theta": 0.6769562955158999,
-        "epsilon": 0.29668015254532254
-      },
-      "grid_size": 32,
-      "hash": "50f1c7cd97ace202"
-    },
-    {
-      "params": {
-        "theta": 3.988052627452912,
-        "epsilon": 0.03119566136865374
-      },
-      "grid_size": 32,
-      "hash": "aa26d094793462c8"
-    },
-    {
-      "params": {
-        "theta": 2.8637267476381973,
-        "epsilon": 0.0035170022937479036
-      },
-      "grid_size": 32,
-      "hash": "c7f7a43c0f456bd8"
-    },
-    {
-      "params": {
-        "theta": 5.881862035970524,
-        "epsilon": 0.015201619616716669
-      },
-      "grid_size": 32,
-      "hash": "0b7f9bd9f3c3c2b1"
-    },
-    {
-      "params": {
-        "theta": 2.329792583887791,
-        "epsilon": 0.3171837329014025
-      },
-      "grid_size": 32,
-      "hash": "12cf852dd4ecb40e"
-    },
-    {
-      "params": {
-        "theta": 0.19363415588975835,
-        "epsilon": 0.015089926829755459
-      },
-      "grid_size": 32,
-      "hash": "506f29f1c2670141"
-    },
-    {
-      "params": {
-        "theta": 2.0725790214111717,
-        "epsilon": 0.0024550845352028536
-      },
-      "grid_size": 32,
-      "hash": "5152987be31f135e"
-    },
-    {
-      "params": {
-        "theta": 1.7889489505444816,
-        "epsilon": 0.0025977535434271366
-      },
-      "grid_size": 32,
-      "hash": "4c1dfaae613ed703"
-    },
-    {
-      "params": {
-        "theta": 2.950306030070987,
-        "epsilon": 0.0032462167539912125
-      },
-      "grid_size": 32,
-      "hash": "6719a16547d545ad"
-    },
-    {
-      "params": {
-        "theta": 0.6822014680661018,
-        "epsilon": 0.06521625360523764
-      },
-      "grid_size": 32,
-      "hash": "24e5e893f754eef3"
-    },
-    {
-      "params": {
-        "theta": 3.5496892077444744,
-        "epsilon": 0.035072989639645974
-      },
-      "grid_size": 32,
-      "hash": "7993ccd98b616d94"
-    },
-    {
-      "params": {
-        "theta": 0.14270415723357513,
-        "epsilon": 0.0017499936595628165
-      },
-      "grid_size": 32,
-      "hash": "63e92d153986bdd7"
-    },
-    {
-      "params": {
-        "theta": 5.786627858176059,
-        "epsilon": 0.0027974681742893846
-      },
-      "grid_size": 32,
-      "hash": "8efe3ceace2b13ec"
-    },
-    {
-      "params": {
-        "theta": 5.236774283285971,
-        "epsilon": 0.0013811584950242227
-      },
-      "grid_size": 32,
-      "hash": "bf9766cd129f48df"
-    },
-    {
-      "params": {
-        "theta": 2.3647361983826247,
-        "epsilon": 0.4601388948557878
-      },
-      "grid_size": 32,
-      "hash": "925cfc6a863e8b59"
-    },
-    {
-      "params": {
-        "theta": 1.4257134183162792,
-        "epsilon": 0.0642403472921395
-      },
-      "grid_size": 32,
-      "hash": "4414fe9d5748f940"
-    },
-    {
-      "params": {
-        "theta": 0.2731618575128441,
-        "epsilon": 0.003089290602672352
-      },
-      "grid_size": 32,
-      "hash": "73402615faed715d"
-    },
-    {
-      "params": {
-        "theta": 3.6699955968029663,
-        "epsilon": 0.05674354768714734
-      },
-      "grid_size": 32,
-      "hash": "3dcebe4d822c94dd"
+      "grid_size": 128,
+      "hash": "3be6bf86013f8183"
     },
     {
       "params": {
         "theta": 4.288245513143006,
         "epsilon": 0.002383349655350177
       },
-      "grid_size": 32,
-      "hash": "8afe94f3e653aa38"
+      "grid_size": 128,
+      "hash": "4773a5eb23ee057d"
     },
     {
       "params": {
-        "theta": 0.9184335353128988,
-        "epsilon": 0.16816821470903753
+        "theta": 5.3947295714184,
+        "epsilon": 0.07623868423300403
       },
-      "grid_size": 32,
-      "hash": "74611dc3e81c5dce"
-    },
-    {
-      "params": {
-        "theta": 4.765918532067644,
-        "epsilon": 0.08745989212538824
-      },
-      "grid_size": 32,
-      "hash": "31e57e522c1dbbf3"
-    },
-    {
-      "params": {
-        "theta": 4.04552366451403,
-        "epsilon": 0.16619154104785644
-      },
-      "grid_size": 32,
-      "hash": "fcb7f507fe9e2cd8"
-    },
-    {
-      "params": {
-        "theta": 0.3094727475172596,
-        "epsilon": 0.01019467423957251
-      },
-      "grid_size": 32,
-      "hash": "18bfc1ff2b5e0867"
-    },
-    {
-      "params": {
-        "theta": 4.3655451810204555,
-        "epsilon": 0.2104044629723812
-      },
-      "grid_size": 32,
-      "hash": "807a6e630f11f9af"
-    },
-    {
-      "params": {
-        "theta": 2.975021502380036,
-        "epsilon": 0.0052548376944934585
-      },
-      "grid_size": 32,
-      "hash": "8ab373562f72c55e"
-    },
-    {
-      "params": {
-        "theta": 0.34805960392974167,
-        "epsilon": 0.0029604115611458113
-      },
-      "grid_size": 32,
-      "hash": "a1aa1f59f4754a7f"
-    },
-    {
-      "params": {
-        "theta": 0.5975041788421016,
-        "epsilon": 0.09092529366404778
-      },
-      "grid_size": 32,
-      "hash": "b3ae50ea03b1504b"
-    },
-    {
-      "params": {
-        "theta": 6.09907526640769,
-        "epsilon": 0.2573398933799412
-      },
-      "grid_size": 32,
-      "hash": "59204db635ed6baa"
-    },
-    {
-      "params": {
-        "theta": 1.9223820715140174,
-        "epsilon": 0.03658442575079546
-      },
-      "grid_size": 32,
-      "hash": "a9fb6c545389e020"
-    },
-    {
-      "params": {
-        "theta": 3.871483083906058,
-        "epsilon": 0.002899413066377583
-      },
-      "grid_size": 32,
-      "hash": "8f55cb93e2dab578"
-    },
-    {
-      "params": {
-        "theta": 0.7357833687100858,
-        "epsilon": 0.0017247414164255905
-      },
-      "grid_size": 32,
-      "hash": "9c0829854137364d"
-    },
-    {
-      "params": {
-        "theta": 4.799871985238543,
-        "epsilon": 0.14359440419551397
-      },
-      "grid_size": 32,
-      "hash": "c5de656e81c8f117"
-    },
-    {
-      "params": {
-        "theta": 1.6705101537930314,
-        "epsilon": 0.4128363896337596
-      },
-      "grid_size": 32,
-      "hash": "abb239abfa92427b"
-    },
-    {
-      "params": {
-        "theta": 0.9903031464658684,
-        "epsilon": 0.00250531817844181
-      },
-      "grid_size": 32,
-      "hash": "4d68df12170c80da"
-    },
-    {
-      "params": {
-        "theta": 2.932494409802645,
-        "epsilon": 0.0013128800527954555
-      },
-      "grid_size": 32,
-      "hash": "fc12504ac5f015dd"
-    },
-    {
-      "params": {
-        "theta": 4.918070238830589,
-        "epsilon": 0.0016721906403325596
-      },
-      "grid_size": 32,
-      "hash": "bae7fd47bd81e31d"
-    },
-    {
-      "params": {
-        "theta": 4.7911305484921165,
-        "epsilon": 0.005372367221120033
-      },
-      "grid_size": 32,
-      "hash": "ecd325be77ffb40c"
-    },
-    {
-      "params": {
-        "theta": 2.936645068168184,
-        "epsilon": 0.1312360076054681
-      },
-      "grid_size": 32,
-      "hash": "594c80dff66bb724"
-    },
-    {
-      "params": {
-        "theta": 2.7577619037167644,
-        "epsilon": 0.0011437480202167334
-      },
-      "grid_size": 32,
-      "hash": "c4bb6b3fe009cff3"
-    },
-    {
-      "params": {
-        "theta": 2.3477606371933617,
-        "epsilon": 0.0017987164377005892
-      },
-      "grid_size": 32,
-      "hash": "33603204469b5a14"
-    },
-    {
-      "params": {
-        "theta": 1.3482751974895735,
-        "epsilon": 0.012665039695654063
-      },
-      "grid_size": 32,
-      "hash": "20b5b5cd66378b72"
-    },
-    {
-      "params": {
-        "theta": 5.114640670627859,
-        "epsilon": 0.0028226361698123962
-      },
-      "grid_size": 32,
-      "hash": "058b5ffbdd44f12d"
-    },
-    {
-      "params": {
-        "theta": 2.4195885455552992,
-        "epsilon": 0.05323068867816566
-      },
-      "grid_size": 32,
-      "hash": "3a17799ef0fb2456"
-    },
-    {
-      "params": {
-        "theta": 3.7075560145768978,
-        "epsilon": 0.0018052399386171878
-      },
-      "grid_size": 32,
-      "hash": "f5358cf358df03e0"
-    },
-    {
-      "params": {
-        "theta": 5.362089388912442,
-        "epsilon": 0.004279525861353168
-      },
-      "grid_size": 32,
-      "hash": "aad92d8e3dc0f4a7"
-    },
-    {
-      "params": {
-        "theta": 0.8817796511780198,
-        "epsilon": 0.013526236488420355
-      },
-      "grid_size": 32,
-      "hash": "725eed2933835fad"
-    },
-    {
-      "params": {
-        "theta": 4.679478406567657,
-        "epsilon": 0.4085824861876187
-      },
-      "grid_size": 32,
-      "hash": "7c84f9650ecaad50"
-    },
-    {
-      "params": {
-        "theta": 3.0577643244473665,
-        "epsilon": 0.021105879713431114
-      },
-      "grid_size": 32,
-      "hash": "8fe88459cae9d852"
-    },
-    {
-      "params": {
-        "theta": 1.4612799617819112,
-        "epsilon": 0.009815294883137567
-      },
-      "grid_size": 32,
-      "hash": "bdc25dfb271e66f0"
-    },
-    {
-      "params": {
-        "theta": 5.597014016800584,
-        "epsilon": 0.2578610109657687
-      },
-      "grid_size": 32,
-      "hash": "b06434af2ba7edad"
-    },
-    {
-      "params": {
-        "theta": 2.8234214498473205,
-        "epsilon": 0.005429649673262818
-      },
-      "grid_size": 32,
-      "hash": "5badb2e5c5d7a132"
-    },
-    {
-      "params": {
-        "theta": 1.2342353450978207,
-        "epsilon": 0.006879458969761474
-      },
-      "grid_size": 32,
-      "hash": "0c66e252fe2feb89"
-    },
-    {
-      "params": {
-        "theta": 0.6056422475384344,
-        "epsilon": 0.27295860761093194
-      },
-      "grid_size": 32,
-      "hash": "c9e798ea691f2955"
-    },
-    {
-      "params": {
-        "theta": 5.851129547544512,
-        "epsilon": 0.002104540868784536
-      },
-      "grid_size": 32,
-      "hash": "4b169a34fbdb3e63"
-    },
-    {
-      "params": {
-        "theta": 2.2733355674399043,
-        "epsilon": 0.0017241081433025318
-      },
-      "grid_size": 32,
-      "hash": "4c6ec558b9174cd1"
-    },
-    {
-      "params": {
-        "theta": 3.513602044288171,
-        "epsilon": 0.006612294643747004
-      },
-      "grid_size": 32,
-      "hash": "c755f2f1f621f79d"
-    },
-    {
-      "params": {
-        "theta": 2.4345983389467065,
-        "epsilon": 0.006000520225308894
-      },
-      "grid_size": 32,
-      "hash": "7717e8f9ceab9713"
-    },
-    {
-      "params": {
-        "theta": 2.3842430137790442,
-        "epsilon": 0.0709252246492455
-      },
-      "grid_size": 32,
-      "hash": "6821c63f89218b96"
-    },
-    {
-      "params": {
-        "theta": 1.4869934092509567,
-        "epsilon": 0.10315022156873448
-      },
-      "grid_size": 32,
-      "hash": "8daa85d60aa66ae1"
-    },
-    {
-      "params": {
-        "theta": 4.002853071785295,
-        "epsilon": 0.002133354128863168
-      },
-      "grid_size": 32,
-      "hash": "c32ef0f70ef3d175"
-    },
-    {
-      "params": {
-        "theta": 0.07730005143498102,
-        "epsilon": 0.016834125146626404
-      },
-      "grid_size": 32,
-      "hash": "03047d9ad5c7abc3"
-    },
-    {
-      "params": {
-        "theta": 3.0922897018053024,
-        "epsilon": 0.04152261661428808
-      },
-      "grid_size": 32,
-      "hash": "a081fc266f9200f4"
-    },
-    {
-      "params": {
-        "theta": 4.36217932169485,
-        "epsilon": 0.03701828522320959
-      },
-      "grid_size": 32,
-      "hash": "e740a0ec7df17014"
-    },
-    {
-      "params": {
-        "theta": 0.53088652511366,
-        "epsilon": 0.335794444956146
-      },
-      "grid_size": 32,
-      "hash": "f934d0f13632b274"
-    },
-    {
-      "params": {
-        "theta": 0.8783704016807253,
-        "epsilon": 0.0020375732624345823
-      },
-      "grid_size": 32,
-      "hash": "56b74df6c0c556bb"
-    },
-    {
-      "params": {
-        "theta": 2.883452717125864,
-        "epsilon": 0.03427799634270199
-      },
-      "grid_size": 32,
-      "hash": "adde98087c08bc46"
-    },
-    {
-      "params": {
-        "theta": 0.9694294222164355,
-        "epsilon": 0.06974749851257472
-      },
-      "grid_size": 32,
-      "hash": "233b271d309b6df7"
-    },
-    {
-      "params": {
-        "theta": 2.733795320955188,
-        "epsilon": 0.47686108261526344
-      },
-      "grid_size": 32,
-      "hash": "5aa5abd0ec96677c"
-    },
-    {
-      "params": {
-        "theta": 1.7997946360519248,
-        "epsilon": 0.31335036900774077
-      },
-      "grid_size": 32,
-      "hash": "fadcdfbc62d43d10"
-    },
-    {
-      "params": {
-        "theta": 3.3682146424456554,
-        "epsilon": 0.02442711079101996
-      },
-      "grid_size": 32,
-      "hash": "cd96ccb2655df822"
-    },
-    {
-      "params": {
-        "theta": 4.430684529504309,
-        "epsilon": 0.12798652166236135
-      },
-      "grid_size": 32,
-      "hash": "f2108d2c5be3763f"
-    },
-    {
-      "params": {
-        "theta": 0.7444228191914559,
-        "epsilon": 0.19749899400445206
-      },
-      "grid_size": 32,
-      "hash": "0ebe67d2c569600d"
-    },
-    {
-      "params": {
-        "theta": 1.6742383195715533,
-        "epsilon": 0.0023835855762302117
-      },
-      "grid_size": 32,
-      "hash": "cfb37e0dede5fd59"
-    },
-    {
-      "params": {
-        "theta": 1.9498901681796355,
-        "epsilon": 0.0024451529562855693
-      },
-      "grid_size": 32,
-      "hash": "c25a52ab35a743b6"
-    },
-    {
-      "params": {
-        "theta": 5.810952558786252,
-        "epsilon": 0.001851413372102095
-      },
-      "grid_size": 32,
-      "hash": "76c5e87b824e3bb8"
-    },
-    {
-      "params": {
-        "theta": 5.300337482254726,
-        "epsilon": 0.27304470553555654
-      },
-      "grid_size": 32,
-      "hash": "753ad4232823e0fe"
-    },
-    {
-      "params": {
-        "theta": 0.9570051190858391,
-        "epsilon": 0.07574392491674478
-      },
-      "grid_size": 32,
-      "hash": "f618740136494f31"
-    },
-    {
-      "params": {
-        "theta": 2.803282418342616,
-        "epsilon": 0.010674925683633638
-      },
-      "grid_size": 32,
-      "hash": "d652cb4e95fff8de"
-    },
-    {
-      "params": {
-        "theta": 5.757584131141986,
-        "epsilon": 0.019859248982727236
-      },
-      "grid_size": 32,
-      "hash": "d630021669296d67"
-    },
-    {
-      "params": {
-        "theta": 0.74145291411509,
-        "epsilon": 0.3945780696783184
-      },
-      "grid_size": 32,
-      "hash": "f5d7d1c71856ab55"
-    },
-    {
-      "params": {
-        "theta": 6.02280487025045,
-        "epsilon": 0.02003191687146936
-      },
-      "grid_size": 32,
-      "hash": "7b98c85e41378597"
-    },
-    {
-      "params": {
-        "theta": 5.191745023719125,
-        "epsilon": 0.2622473100859871
-      },
-      "grid_size": 32,
-      "hash": "ff51916d6029d41a"
-    },
-    {
-      "params": {
-        "theta": 0.8300265657905013,
-        "epsilon": 0.045518976779267625
-      },
-      "grid_size": 32,
-      "hash": "d8814aa59cccae71"
-    },
-    {
-      "params": {
-        "theta": 2.7149205061193347,
-        "epsilon": 0.0493273454463208
-      },
-      "grid_size": 32,
-      "hash": "8d0d764cbfc4ef42"
-    },
-    {
-      "params": {
-        "theta": 4.850696933253278,
-        "epsilon": 0.061066622755028964
-      },
-      "grid_size": 32,
-      "hash": "bf615aef7f2ba807"
-    },
-    {
-      "params": {
-        "theta": 0.8812109722597362,
-        "epsilon": 0.031284335357424455
-      },
-      "grid_size": 32,
-      "hash": "9d5f6eff94b3cdc0"
-    },
-    {
-      "params": {
-        "theta": 5.213722467203431,
-        "epsilon": 0.1518610782200601
-      },
-      "grid_size": 32,
-      "hash": "4feb9fcf6d040800"
-    },
-    {
-      "params": {
-        "theta": 1.84470389489326,
-        "epsilon": 0.06116356890267729
-      },
-      "grid_size": 32,
-      "hash": "6d31baec421832d6"
-    },
-    {
-      "params": {
-        "theta": 4.893035998534321,
-        "epsilon": 0.08607263865104076
-      },
-      "grid_size": 32,
-      "hash": "a3b0372b3f564a29"
-    },
-    {
-      "params": {
-        "theta": 2.288285823185103,
-        "epsilon": 0.007057714313413493
-      },
-      "grid_size": 32,
-      "hash": "b30d38c045f10bb1"
-    },
-    {
-      "params": {
-        "theta": 0.15619678338575488,
-        "epsilon": 0.03151104912096013
-      },
-      "grid_size": 32,
-      "hash": "1cf5f152f2b9dae8"
-    },
-    {
-      "params": {
-        "theta": 0.8163208535012554,
-        "epsilon": 0.01922707971132378
-      },
-      "grid_size": 32,
-      "hash": "a846001678d917db"
-    },
-    {
-      "params": {
-        "theta": 3.8077095143849977,
-        "epsilon": 0.21978669975124432
-      },
-      "grid_size": 32,
-      "hash": "dd619358f05b1367"
-    },
-    {
-      "params": {
-        "theta": 3.589160428940413,
-        "epsilon": 0.013288617501500979
-      },
-      "grid_size": 32,
-      "hash": "e9d8c52e8f59d588"
-    },
-    {
-      "params": {
-        "theta": 4.897601592011302,
-        "epsilon": 0.0542054669775171
-      },
-      "grid_size": 32,
-      "hash": "b630ef1ee4e5a481"
-    },
-    {
-      "params": {
-        "theta": 4.09620324095871,
-        "epsilon": 0.21944778120913477
-      },
-      "grid_size": 32,
-      "hash": "ce6ef3867304a71b"
-    },
-    {
-      "params": {
-        "theta": 5.032103441915238,
-        "epsilon": 0.040024869277016345
-      },
-      "grid_size": 32,
-      "hash": "6225a104a1618449"
-    },
-    {
-      "params": {
-        "theta": 0.2614695529964349,
-        "epsilon": 0.021541026924484046
-      },
-      "grid_size": 32,
-      "hash": "908a3fbd2ebebff1"
-    },
-    {
-      "params": {
-        "theta": 1.4617248203123665,
-        "epsilon": 0.027072677152534745
-      },
-      "grid_size": 32,
-      "hash": "75382b6061825c8e"
-    },
-    {
-      "params": {
-        "theta": 1.7670438921104994,
-        "epsilon": 0.060222934157628624
-      },
-      "grid_size": 32,
-      "hash": "fafc235505423697"
-    },
-    {
-      "params": {
-        "theta": 5.186137827756057,
-        "epsilon": 0.0062685219352219225
-      },
-      "grid_size": 32,
-      "hash": "4ed4bfcc65b1ad55"
-    },
-    {
-      "params": {
-        "theta": 4.5678416555681265,
-        "epsilon": 0.11872892198703452
-      },
-      "grid_size": 32,
-      "hash": "4d08e4c2f80bfc69"
-    },
-    {
-      "params": {
-        "theta": 5.708780567143676,
-        "epsilon": 0.07735503126171704
-      },
-      "grid_size": 32,
-      "hash": "15786fc4efea0b96"
-    },
-    {
-      "params": {
-        "theta": 5.892537114501987,
-        "epsilon": 0.03492021138606982
-      },
-      "grid_size": 32,
-      "hash": "c7350b1571973a57"
-    },
-    {
-      "params": {
-        "theta": 3.650914637048426,
-        "epsilon": 0.008633585571272754
-      },
-      "grid_size": 32,
-      "hash": "3d791980c013057e"
-    },
-    {
-      "params": {
-        "theta": 2.8519180810085754,
-        "epsilon": 0.004665643444565498
-      },
-      "grid_size": 32,
-      "hash": "4ea4826e226b1b61"
-    },
-    {
-      "params": {
-        "theta": 3.9767385544498755,
-        "epsilon": 0.005994091376886895
-      },
-      "grid_size": 32,
-      "hash": "24137171a7dd536f"
-    },
-    {
-      "params": {
-        "theta": 2.7860534428589045,
-        "epsilon": 0.004104974786241306
-      },
-      "grid_size": 32,
-      "hash": "b9cfae63b97ac1a8"
-    },
-    {
-      "params": {
-        "theta": 3.499936064108435,
-        "epsilon": 0.13053222859043476
-      },
-      "grid_size": 32,
-      "hash": "fe7b74b214607272"
-    },
-    {
-      "params": {
-        "theta": 5.497817927974358,
-        "epsilon": 0.19823426757515805
-      },
-      "grid_size": 32,
-      "hash": "19d94fc17557ef7f"
-    },
-    {
-      "params": {
-        "theta": 4.5387174362773575,
-        "epsilon": 0.017643826972393264
-      },
-      "grid_size": 32,
-      "hash": "884bcda740d5e4e0"
+      "grid_size": 128,
+      "hash": "c5a4fb913a8bc45a"
     },
     {
       "params": {
         "theta": 4.8629090349461,
         "epsilon": 0.015293952761249943
       },
-      "grid_size": 32,
-      "hash": "776fc0e39f88d41a"
+      "grid_size": 128,
+      "hash": "ea0b1d60c36dfea1"
     },
     {
       "params": {
-        "theta": 1.8944562358526005,
-        "epsilon": 0.05024742528370199
+        "theta": 0.9694294222164355,
+        "epsilon": 0.06974749851257472
       },
-      "grid_size": 32,
-      "hash": "a7baad1631726769"
+      "grid_size": 128,
+      "hash": "7b3e88d2b5f258d2"
     },
     {
       "params": {
-        "theta": 0.7654961655944172,
-        "epsilon": 0.023257835674723448
+        "theta": 4.679478406567657,
+        "epsilon": 0.4085824861876187
       },
-      "grid_size": 32,
-      "hash": "0c70e2f521dabdb0"
+      "grid_size": 128,
+      "hash": "742406b00dfa9771"
     },
     {
       "params": {
-        "theta": 0.08756427388385632,
-        "epsilon": 0.004167107807693624
+        "theta": 2.329792583887791,
+        "epsilon": 0.3171837329014025
       },
-      "grid_size": 32,
-      "hash": "7a356a6c60167775"
+      "grid_size": 128,
+      "hash": "089c216fc29c0ed7"
     },
     {
       "params": {
-        "theta": 0.7256454356712033,
-        "epsilon": 0.0011404542336200902
+        "theta": 2.932494409802645,
+        "epsilon": 0.0013128800527954555
       },
-      "grid_size": 32,
-      "hash": "30ff266aebc6fdf7"
-    },
-    {
-      "params": {
-        "theta": 1.1106960981720364,
-        "epsilon": 0.20510500492485698
-      },
-      "grid_size": 32,
-      "hash": "d1ed147d7d7988e6"
-    },
-    {
-      "params": {
-        "theta": 1.9979968905026624,
-        "epsilon": 0.02299858836164238
-      },
-      "grid_size": 32,
-      "hash": "3e8b893bf781dcc0"
-    },
-    {
-      "params": {
-        "theta": 0.11207181353244967,
-        "epsilon": 0.0019704997015512074
-      },
-      "grid_size": 32,
-      "hash": "2f12953dd5fd942b"
-    },
-    {
-      "params": {
-        "theta": 4.495035345695061,
-        "epsilon": 0.09874057689085267
-      },
-      "grid_size": 32,
-      "hash": "c2d761d7ff33689c"
-    },
-    {
-      "params": {
-        "theta": 5.331662534655106,
-        "epsilon": 0.057718316774679326
-      },
-      "grid_size": 32,
-      "hash": "9e29ea872162c113"
-    },
-    {
-      "params": {
-        "theta": 1.4464770943808516,
-        "epsilon": 0.0012617559660184575
-      },
-      "grid_size": 32,
-      "hash": "26f9682f8b7b6f0c"
-    },
-    {
-      "params": {
-        "theta": 0.418201611637921,
-        "epsilon": 0.040212273531497186
-      },
-      "grid_size": 32,
-      "hash": "d6c6d0978bee9829"
-    },
-    {
-      "params": {
-        "theta": 0.8049616551224996,
-        "epsilon": 0.016427751954957742
-      },
-      "grid_size": 32,
-      "hash": "627936acf7fe273d"
-    },
-    {
-      "params": {
-        "theta": 1.013300422947241,
-        "epsilon": 0.022506337068172167
-      },
-      "grid_size": 32,
-      "hash": "5db616a9ebbb5e14"
-    },
-    {
-      "params": {
-        "theta": 0.530579291921334,
-        "epsilon": 0.013251093123463804
-      },
-      "grid_size": 32,
-      "hash": "d435b13a3b7d3f17"
-    },
-    {
-      "params": {
-        "theta": 0.33540855835407896,
-        "epsilon": 0.039398476456340606
-      },
-      "grid_size": 32,
-      "hash": "9e63daef39b4af73"
-    },
-    {
-      "params": {
-        "theta": 3.290836671088427,
-        "epsilon": 0.00188108931359642
-      },
-      "grid_size": 32,
-      "hash": "7bb2f05af33fb026"
-    },
-    {
-      "params": {
-        "theta": 2.096307758561611,
-        "epsilon": 0.26586695662235793
-      },
-      "grid_size": 32,
-      "hash": "e7484017db0a004f"
-    },
-    {
-      "params": {
-        "theta": 2.30211154486153,
-        "epsilon": 0.007654215844251648
-      },
-      "grid_size": 32,
-      "hash": "ced6167b0f4fdff0"
-    },
-    {
-      "params": {
-        "theta": 4.944391444855773,
-        "epsilon": 0.062289166462830274
-      },
-      "grid_size": 32,
-      "hash": "a99d37d9278e3784"
-    },
-    {
-      "params": {
-        "theta": 5.944063050687907,
-        "epsilon": 0.004829187542120588
-      },
-      "grid_size": 32,
-      "hash": "ea6f62aced457ae7"
-    },
-    {
-      "params": {
-        "theta": 4.6922172841840295,
-        "epsilon": 0.0051094371315668205
-      },
-      "grid_size": 32,
-      "hash": "a39c123727cf4f29"
-    },
-    {
-      "params": {
-        "theta": 4.890727513061404,
-        "epsilon": 0.0033521545557804863
-      },
-      "grid_size": 32,
-      "hash": "7055aa0a54115b06"
-    },
-    {
-      "params": {
-        "theta": 0.36632691203961426,
-        "epsilon": 0.005747072611504051
-      },
-      "grid_size": 32,
-      "hash": "56e05d3654db5da2"
-    },
-    {
-      "params": {
-        "theta": 2.9278709234343525,
-        "epsilon": 0.02573756671793333
-      },
-      "grid_size": 32,
-      "hash": "929d742d3cc19693"
-    },
-    {
-      "params": {
-        "theta": 2.0631541978673855,
-        "epsilon": 0.0278690674731572
-      },
-      "grid_size": 32,
-      "hash": "b789db7bce977ce8"
-    },
-    {
-      "params": {
-        "theta": 5.130652605813662,
-        "epsilon": 0.0019237223010404667
-      },
-      "grid_size": 32,
-      "hash": "3e94c04c032e6950"
-    },
-    {
-      "params": {
-        "theta": 4.277055304068757,
-        "epsilon": 0.011545075989526567
-      },
-      "grid_size": 32,
-      "hash": "03ba1c9d4007af33"
-    },
-    {
-      "params": {
-        "theta": 3.9833829120879183,
-        "epsilon": 0.0019311406968295262
-      },
-      "grid_size": 32,
-      "hash": "3f0f40868c5da6a2"
-    },
-    {
-      "params": {
-        "theta": 5.211453431601985,
-        "epsilon": 0.1414442901067942
-      },
-      "grid_size": 32,
-      "hash": "54eb05376a408b03"
-    },
-    {
-      "params": {
-        "theta": 4.164898478672949,
-        "epsilon": 0.379488400930159
-      },
-      "grid_size": 32,
-      "hash": "306d573e89d83191"
-    },
-    {
-      "params": {
-        "theta": 4.399895184924001,
-        "epsilon": 0.006967359110462964
-      },
-      "grid_size": 32,
-      "hash": "4766215c70c53965"
-    },
-    {
-      "params": {
-        "theta": 4.9173720348467995,
-        "epsilon": 0.13995586424596893
-      },
-      "grid_size": 32,
-      "hash": "9f88ea32e64575fc"
-    },
-    {
-      "params": {
-        "theta": 2.4084693606776795,
-        "epsilon": 0.09319655098884873
-      },
-      "grid_size": 32,
-      "hash": "509d3996ea36287a"
-    },
-    {
-      "params": {
-        "theta": 6.15482380670147,
-        "epsilon": 0.14609783947979654
-      },
-      "grid_size": 32,
-      "hash": "3dc03e8ce9a47c12"
-    },
-    {
-      "params": {
-        "theta": 0.6496999757498206,
-        "epsilon": 0.03855094900628734
-      },
-      "grid_size": 32,
-      "hash": "20fc5e78c81b16a1"
-    },
-    {
-      "params": {
-        "theta": 3.4862407128935273,
-        "epsilon": 0.010025547941214942
-      },
-      "grid_size": 32,
-      "hash": "5e0c65b42c7e5746"
+      "grid_size": 128,
+      "hash": "8d7403f02390c5db"
     },
     {
       "params": {
         "theta": 2.7467063793798454,
         "epsilon": 0.1767557189844014
       },
-      "grid_size": 32,
-      "hash": "45d60e24270ff001"
+      "grid_size": 128,
+      "hash": "163ae9cff3793c9e"
+    },
+    {
+      "params": {
+        "theta": 5.229242300229306,
+        "epsilon": 0.14860549252653657
+      },
+      "grid_size": 128,
+      "hash": "8321cd3f27b9d19d"
+    },
+    {
+      "params": {
+        "theta": 4.782381558450256,
+        "epsilon": 0.13230126033997305
+      },
+      "grid_size": 128,
+      "hash": "487e7e681e4fcf55"
+    },
+    {
+      "params": {
+        "theta": 4.763205517188319,
+        "epsilon": 0.009054301536060688
+      },
+      "grid_size": 128,
+      "hash": "453a30508926210a"
     },
     {
       "params": {
         "theta": 1.2560602191685635,
         "epsilon": 0.0010468164658156503
       },
-      "grid_size": 32,
-      "hash": "66813771667be8b7"
+      "grid_size": 128,
+      "hash": "af72b73e18966e26"
     },
     {
       "params": {
-        "theta": 0.863359444894568,
-        "epsilon": 0.38724785554968
+        "theta": 0.8163208535012554,
+        "epsilon": 0.01922707971132378
       },
-      "grid_size": 32,
-      "hash": "e3cc352ba0095ab5"
+      "grid_size": 128,
+      "hash": "4e2c7bef58a21346"
     },
     {
       "params": {
-        "theta": 1.0718671810164346,
-        "epsilon": 0.3139579248628472
+        "theta": 4.430684529504309,
+        "epsilon": 0.12798652166236135
       },
-      "grid_size": 32,
-      "hash": "7d6fcfb2eb457f79"
+      "grid_size": 128,
+      "hash": "ca53e8fe95dec990"
     },
     {
       "params": {
-        "theta": 0.7713107995588627,
-        "epsilon": 0.1750443801953985
+        "theta": 5.2001597653962115,
+        "epsilon": 0.050680777174435476
       },
-      "grid_size": 32,
-      "hash": "2a85b4021773fc7d"
+      "grid_size": 128,
+      "hash": "de645e99036f2f67"
     },
     {
       "params": {
-        "theta": 3.766032964941891,
-        "epsilon": 0.229306684581621
+        "theta": 4.890727513061404,
+        "epsilon": 0.0033521545557804863
       },
-      "grid_size": 32,
-      "hash": "96a2ebf72d9eb389"
+      "grid_size": 128,
+      "hash": "a826e22c46717266"
+    },
+    {
+      "params": {
+        "theta": 2.4345983389467065,
+        "epsilon": 0.006000520225308894
+      },
+      "grid_size": 128,
+      "hash": "869c33ee52f35055"
     },
     {
       "params": {
         "theta": 2.0472210028732643,
         "epsilon": 0.00999676848494054
       },
-      "grid_size": 32,
-      "hash": "6066a6ab5fef4233"
+      "grid_size": 128,
+      "hash": "73810e8110dd4220"
     },
     {
       "params": {
-        "theta": 3.7128313523436653,
-        "epsilon": 0.0011522506555821034
+        "theta": 4.944391444855773,
+        "epsilon": 0.062289166462830274
       },
-      "grid_size": 32,
-      "hash": "7e3accacd81e78bf"
+      "grid_size": 128,
+      "hash": "114cef1f00df7cc5"
     },
     {
       "params": {
-        "theta": 1.827890596834421,
-        "epsilon": 0.0245540842870251
+        "theta": 6.09907526640769,
+        "epsilon": 0.2573398933799412
       },
-      "grid_size": 32,
-      "hash": "eb319ad06a534134"
+      "grid_size": 128,
+      "hash": "d5f2b93583b1103a"
+    },
+    {
+      "params": {
+        "theta": 0.5917336995874611,
+        "epsilon": 0.4297100021154879
+      },
+      "grid_size": 128,
+      "hash": "b8deeb67194dcf73"
+    },
+    {
+      "params": {
+        "theta": 0.8783704016807253,
+        "epsilon": 0.0020375732624345823
+      },
+      "grid_size": 128,
+      "hash": "863de3aad0559835"
+    },
+    {
+      "params": {
+        "theta": 4.399895184924001,
+        "epsilon": 0.006967359110462964
+      },
+      "grid_size": 128,
+      "hash": "ac559540284769a8"
+    },
+    {
+      "params": {
+        "theta": 2.7860534428589045,
+        "epsilon": 0.004104974786241306
+      },
+      "grid_size": 128,
+      "hash": "490460917b98302c"
+    },
+    {
+      "params": {
+        "theta": 1.4257134183162792,
+        "epsilon": 0.0642403472921395
+      },
+      "grid_size": 128,
+      "hash": "3b0565e94ef02fce"
+    },
+    {
+      "params": {
+        "theta": 4.04552366451403,
+        "epsilon": 0.16619154104785644
+      },
+      "grid_size": 128,
+      "hash": "d8f09e450ee1ce1c"
+    },
+    {
+      "params": {
+        "theta": 3.4845588150060878,
+        "epsilon": 0.0014867599716649842
+      },
+      "grid_size": 128,
+      "hash": "ff8212b6747f8f2e"
+    },
+    {
+      "params": {
+        "theta": 2.950306030070987,
+        "epsilon": 0.0032462167539912125
+      },
+      "grid_size": 128,
+      "hash": "7b375bc549660d18"
+    },
+    {
+      "params": {
+        "theta": 0.8049616551224996,
+        "epsilon": 0.016427751954957742
+      },
+      "grid_size": 128,
+      "hash": "c47978772a76dcc4"
     }
   ],
   "test_params": {},
-  "min_distance": 0.05
+  "min_distance": 0.02
 }

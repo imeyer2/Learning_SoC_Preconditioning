@@ -2,15 +2,24 @@
 PyAMG solver building utilities.
 
 Constructs C matrices from selected edges and builds PyAMG solvers.
+
+Three hierarchy strategies are supported:
+1. HYBRID (default): GNN for fine level, PyAMG standard for coarser levels
+2. FULL_GNN: GNN computes C at every level (slower, requires iterative build)
+3. PREDEFINED_ONLY: Only GNN C, PyAMG builds rest (can fail with bad C)
 """
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List, Literal
 import numpy as np
 import scipy.sparse as sp
 import torch
 import pyamg
 
 from .sampling import sample_deterministic_topk
+
+
+# Hierarchy strategy types
+HierarchyStrategy = Literal["hybrid", "full_gnn", "predefined_only"]
 
 
 def C_from_selected_edges(
@@ -89,36 +98,231 @@ def build_pyamg_solver(
     C: sp.csr_matrix,
     B: Optional[np.ndarray] = None,
     coarse_solver: str = "splu",
+    max_levels: Optional[int] = None,
+    max_coarse: int = 10,
+    hierarchy_strategy: HierarchyStrategy = "hybrid",
+    fallback_strength: Tuple = ('symmetric', {'theta': 0.0}),
 ) -> pyamg.multilevel.MultilevelSolver:
     """
     Build PyAMG Smoothed Aggregation solver using predefined C matrix.
     
     Args:
         A: System matrix
-        C: Strength-of-connection matrix (predefined)
+        C: Strength-of-connection matrix (predefined by GNN)
         B: Near-nullspace candidates (optional)
         coarse_solver: Coarse grid solver (splu, lu, cg, etc.)
+        max_levels: Maximum number of levels in hierarchy (None = unlimited)
+        max_coarse: Maximum size of coarsest grid before stopping
+        hierarchy_strategy: How to handle multi-level hierarchy:
+            - "hybrid": GNN C for level 0, fallback_strength for coarser levels
+            - "predefined_only": Use GNN C only (may produce bad hierarchies)
+            - "full_gnn": Not supported here (use build_pyamg_solver_full_gnn)
+        fallback_strength: Strength method for coarser levels in hybrid mode
         
     Returns:
         ml: PyAMG multilevel solver
     """
-    strength = ("predefined", {"C": C})
+    if hierarchy_strategy == "full_gnn":
+        raise ValueError(
+            "full_gnn strategy requires build_pyamg_solver_full_gnn() "
+            "which iteratively builds C at each level"
+        )
     
-    if B is None:
-        ml = pyamg.smoothed_aggregation_solver(
-            A,
-            strength=strength,
-            coarse_solver=coarse_solver
-        )
-    else:
-        ml = pyamg.smoothed_aggregation_solver(
-            A,
-            strength=strength,
-            B=B,
-            coarse_solver=coarse_solver
-        )
+    if hierarchy_strategy == "hybrid":
+        # GNN for level 0, standard PyAMG for deeper levels
+        strength = [
+            ('predefined', {'C': C}),  # Level 0: GNN-generated C
+            fallback_strength,          # Level 1+: PyAMG standard  
+        ]
+    else:  # predefined_only
+        strength = ('predefined', {'C': C})
+    
+    kwargs = {
+        "strength": strength,
+        "coarse_solver": coarse_solver,
+        "max_coarse": max_coarse,
+    }
+    if max_levels is not None:
+        kwargs["max_levels"] = max_levels
+    if B is not None:
+        kwargs["B"] = B
+    
+    ml = pyamg.smoothed_aggregation_solver(A, **kwargs)
     
     return ml
+
+
+def build_pyamg_solver_full_gnn(
+    A: sp.csr_matrix,
+    model: torch.nn.Module,
+    k_per_row: int,
+    B: Optional[np.ndarray] = None,
+    coarse_solver: str = "splu",
+    max_levels: int = 10,
+    max_coarse: int = 10,
+    device: str = "cpu",
+    use_learned_k: bool = False,
+) -> pyamg.multilevel.MultilevelSolver:
+    """
+    Build PyAMG solver with GNN-generated C at EVERY level.
+    
+    This iteratively:
+    1. Runs GNN on current A to get C
+    2. Uses C to build aggregates and prolongation
+    3. Computes coarse A
+    4. Repeats until coarse enough
+    
+    Args:
+        A: Fine-level system matrix
+        model: Trained AMG policy (must accept variable-size graphs)
+        k_per_row: Number of edges to select per row (used if use_learned_k=False)
+        B: Near-nullspace candidates (optional)
+        coarse_solver: Coarse grid solver
+        max_levels: Maximum hierarchy depth
+        max_coarse: Stop when coarse grid has fewer unknowns
+        device: Device for GNN inference
+        use_learned_k: If True and model predicts k, use learned per-node k values
+        
+    Returns:
+        ml: PyAMG multilevel solver with GNN C at each level
+    """
+    from ..data import node_features_for_policy
+    from torch_geometric.utils import from_scipy_sparse_matrix
+    from .sampling import build_row_groups
+    
+    # Collect C matrices for each level
+    C_list = []
+    current_A = A.copy()
+    
+    for level in range(max_levels - 1):
+        n = current_A.shape[0]
+        if n <= max_coarse:
+            break
+            
+        # Build features for current level
+        # Note: coordinates are approximated for coarse levels
+        coords = _estimate_coords_for_coarse_level(current_A, level)
+        
+        feature_config = {
+            "use_relaxed_vectors": True,
+            "use_coordinates": True,
+            "num_vecs": 4,
+            "relax_iters": 5,
+            "relaxation_scheme": "jacobi",
+            "omega": 2.0 / 3.0,
+        }
+        x = node_features_for_policy(current_A, coords, feature_config).to(device)
+        
+        # Build graph
+        ei, ew = from_scipy_sparse_matrix(current_A)
+        ew = ew.float()
+        max_w = ew.abs().max()
+        if max_w > 0:
+            ew = ew / max_w
+        ei = ei.to(device)
+        ew = ew.to(device)
+        
+        # Run GNN
+        model.eval()
+        with torch.no_grad():
+            output = model(x, ei, ew)
+        
+        # Handle both dict-based and legacy tuple-based returns
+        if isinstance(output, dict):
+            logits = output['edge_logits']
+            k_per_node = output.get('k_per_node')
+        else:
+            logits = output[0]
+            k_per_node = None
+        
+        # Determine which k to use
+        if use_learned_k and k_per_node is not None:
+            k_to_use = k_per_node
+        else:
+            k_to_use = k_per_row
+        
+        # Select top-k edges
+        row_groups = build_row_groups(ei.cpu(), num_nodes=n)
+        selected = sample_deterministic_topk(logits, row_groups, k_to_use)
+        
+        # Build C for this level
+        C = C_from_selected_edges(current_A, ei.cpu(), selected.cpu().numpy())
+        C_list.append(C)
+        
+        # Compute coarse A (approximate - using standard aggregation)
+        # This is needed to continue the loop
+        temp_ml = pyamg.smoothed_aggregation_solver(
+            current_A, 
+            strength=('predefined', {'C': C}),
+            max_levels=2,
+            max_coarse=1
+        )
+        if len(temp_ml.levels) > 1:
+            current_A = temp_ml.levels[1].A
+        else:
+            break
+    
+    # Build final solver with all C matrices
+    strength_list = [('predefined', {'C': C}) for C in C_list]
+    # Add fallback for any remaining levels
+    strength_list.append(('symmetric', {'theta': 0.0}))
+    
+    kwargs = {
+        "strength": strength_list,
+        "coarse_solver": coarse_solver,
+        "max_coarse": max_coarse,
+        "max_levels": max_levels,
+    }
+    if B is not None:
+        kwargs["B"] = B
+    
+    ml = pyamg.smoothed_aggregation_solver(A, **kwargs)
+    
+    return ml
+
+
+def _estimate_coords_for_coarse_level(A: sp.csr_matrix, level: int) -> np.ndarray:
+    """
+    Estimate node coordinates for coarse level matrices.
+    
+    For coarse levels, we don't have exact coordinates. We use spectral
+    embedding as a reasonable approximation.
+    
+    Args:
+        A: Coarse level matrix
+        level: Hierarchy level (0 = fine)
+        
+    Returns:
+        coords: (n, 2) estimated coordinates
+    """
+    n = A.shape[0]
+    
+    if n <= 100:
+        # For very coarse grids, just use random layout
+        return np.random.randn(n, 2)
+    
+    # Use simple spectral embedding (Laplacian eigenvectors)
+    try:
+        from scipy.sparse.linalg import eigsh
+        
+        # Build graph Laplacian
+        D = sp.diags(np.array(A.sum(axis=1)).flatten())
+        L = D - A
+        
+        # Get 2 smallest non-trivial eigenvectors
+        _, V = eigsh(L.tocsr(), k=3, which='SM', tol=1e-3)
+        coords = V[:, 1:3]  # Skip constant eigenvector
+        
+        # Normalize to [0, 1]
+        coords = coords - coords.min(axis=0)
+        max_range = coords.max(axis=0) + 1e-10
+        coords = coords / max_range
+        
+    except Exception:
+        # Fallback to random
+        coords = np.random.randn(n, 2)
+    
+    return coords
 
 
 def build_C_from_model(
@@ -127,18 +331,21 @@ def build_C_from_model(
     model: torch.nn.Module,
     k_per_row: int,
     device: str = "cpu",
+    use_learned_k: bool = False,
 ) -> Tuple[sp.csr_matrix, Optional[np.ndarray]]:
     """
     Build C matrix and B candidates from trained model.
     
     Runs model inference and deterministically selects top-k edges per row.
+    If the model predicts per-node k values, those can be used instead of fixed k_per_row.
     
     Args:
         A: Sparse matrix
-        grid_n: Grid size
+        grid_n: Grid size (number of physical nodes per dimension, NOT DOFs)
         model: Trained AMG policy
-        k_per_row: Number of edges to select per row
+        k_per_row: Number of edges to select per row (used if use_learned_k=False or model doesn't predict k)
         device: Device for inference
+        use_learned_k: If True and model predicts k, use the learned per-node k values
         
     Returns:
         C: Strength matrix
@@ -148,11 +355,22 @@ def build_C_from_model(
     from torch_geometric.utils import from_scipy_sparse_matrix
     
     # Build node coordinates
+    # For vector problems (elasticity), n = grid_n^2 * dofs_per_node
+    # So we need to repeat coordinates for each DOF
     n = A.shape[0]
-    grid_n_actual = int(np.sqrt(n))
-    coords = np.zeros((n, 2), dtype=np.float64)
-    coords[:, 0] = np.tile(np.linspace(0, 1, grid_n_actual), grid_n_actual)
-    coords[:, 1] = np.repeat(np.linspace(0, 1, grid_n_actual), grid_n_actual)
+    num_physical_nodes = grid_n * grid_n
+    dofs_per_node = n // num_physical_nodes
+    
+    # Generate coordinates for physical nodes
+    physical_coords = np.zeros((num_physical_nodes, 2), dtype=np.float64)
+    physical_coords[:, 0] = np.tile(np.linspace(0, 1, grid_n), grid_n)
+    physical_coords[:, 1] = np.repeat(np.linspace(0, 1, grid_n), grid_n)
+    
+    # Repeat for each DOF (e.g., for elasticity: x-dof and y-dof at same location)
+    if dofs_per_node > 1:
+        coords = np.repeat(physical_coords, dofs_per_node, axis=0)
+    else:
+        coords = physical_coords
     
     # Build features
     feature_config = {
@@ -178,12 +396,27 @@ def build_C_from_model(
     # Run model
     model.eval()
     with torch.no_grad():
-        logits, B_extra = model(x, ei, ew)
+        output = model(x, ei, ew)
+    
+    # Handle both dict-based and legacy tuple-based returns
+    if isinstance(output, dict):
+        logits = output['edge_logits']
+        B_extra = output['B_extra']
+        k_per_node = output.get('k_per_node')  # None if learn_k=False
+    else:
+        logits, B_extra = output[:2]
+        k_per_node = None
+    
+    # Determine which k to use
+    if use_learned_k and k_per_node is not None:
+        k_to_use = k_per_node
+    else:
+        k_to_use = k_per_row
     
     # Deterministic top-k selection
     from .sampling import build_row_groups
     row_groups = build_row_groups(ei.cpu(), num_nodes=A.shape[0])
-    selected = sample_deterministic_topk(logits, row_groups, k_per_row)
+    selected = sample_deterministic_topk(logits, row_groups, k_to_use)
     
     # Build C matrix
     C = C_from_selected_edges(A, ei.cpu(), selected.cpu().numpy())

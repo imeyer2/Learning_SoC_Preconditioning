@@ -42,12 +42,36 @@ class GATBackbone(nn.Module):
         
         self.out_dim = hidden_dim
     
-    def forward(self, x: torch.Tensor, edge_index: torch.Tensor) -> torch.Tensor:
+    def forward(
+        self, 
+        x: torch.Tensor, 
+        edge_index: torch.Tensor,
+        return_attention: bool = False,
+    ):
+        """
+        Forward pass.
+        
+        Args:
+            x: Node features
+            edge_index: Edge connectivity
+            return_attention: If True, also return attention weights from last layer
+            
+        Returns:
+            h: Node embeddings
+            attn: (optional) Attention weights if return_attention=True
+        """
         x = F.elu(self.conv1(x, edge_index))
         if self.dropout > 0:
             x = F.dropout(x, p=self.dropout, training=self.training)
-        x = self.conv2(x, edge_index)
-        return x
+        
+        if return_attention:
+            x, (edge_index_out, attn_weights) = self.conv2(
+                x, edge_index, return_attention_weights=True
+            )
+            return x, attn_weights
+        else:
+            x = self.conv2(x, edge_index)
+            return x
 
 
 class GCNBackbone(nn.Module):

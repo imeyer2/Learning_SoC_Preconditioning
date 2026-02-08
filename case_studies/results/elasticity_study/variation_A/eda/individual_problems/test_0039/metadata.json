@@ -7,8 +7,8 @@
     "nu": 0.3142503640819019
   },
   "learned_iterations": 18,
-  "baseline_iterations": 20,
-  "tuned_iterations": 35,
-  "learned_time": 0.010854959487915039,
-  "baseline_time": 0.007058858871459961
+  "baseline_iterations": 27,
+  "tuned_iterations": 34,
+  "learned_time": 0.009716987609863281,
+  "baseline_time": 0.007964134216308594
 }

@@ -30,15 +30,20 @@ temperature:
 
 # Sampling strategy
 sampling:
-
-  # TODO: why can't this be ML as well?
-  k_per_row: 5  # Number of strong edges to select per node. TODO: why can't this be ML as well?
+  # Learnable k: If true, the model predicts per-node k values
+  # If false, uses fixed k_per_row for all nodes
+  learnable_k: true
+  
+  k_per_row: 5  # Number of strong edges to select per node (used when learnable_k=false)
+  k_min: 1      # Minimum k when learnable (prevents degenerate solutions)
+  k_max: 25      # Maximum k when learnable (prevents too dense C)
+  
   method: topk_without_replacement  # topk_without_replacement, gumbel_softmax
   gumbel: true
 
 # Reward configuration
 reward:
-  function: vcycle_energy_reduction  # vcycle_energy_reduction, pcg_iterations, hybrid
+  function: pcg_residual_reduction  # vcycle_energy_reduction, pcg_iterations, hybrid
   
   # V-cycle reward parameters
   vcycle:
@@ -46,6 +51,11 @@ reward:
     relax_iters: 25
     omega: 0.6666666  # 2/3
     cycle_type: V  # V or W
+  
+  # PCG residual reduction reward parameters (if function: pcg_residual_reduction)
+  pcg:
+    num_iters: 5  # Number of PCG iterations to run
+    num_test_vecs: 3  # Number of random RHS to average over
   
   # Complexity penalty
   complexity:

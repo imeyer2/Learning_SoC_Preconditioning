@@ -208,3 +208,112 @@ def plot_condition_number_comparison(
     
     plt.tight_layout()
     return fig
+
+
+def plot_eigenvalue_spectra_comparison(
+    eigenvalues_baseline: np.ndarray,
+    eigenvalues_learned: np.ndarray,
+    title: str = "Eigenvalue Spectra of $M^{-1}A$",
+    figsize: Tuple[int, int] = (14, 5),
+) -> Figure:
+    """
+    Plot eigenvalue spectra comparison like the reference script.
+    
+    Creates two subplots:
+    1. Sorted eigenvalues with condition numbers
+    2. Eigenvalue density histogram
+    
+    Args:
+        eigenvalues_baseline: Eigenvalues for baseline preconditioner
+        eigenvalues_learned: Eigenvalues for learned preconditioner
+        title: Plot title
+        figsize: Figure size
+        
+    Returns:
+        matplotlib Figure with 2 subplots
+    """
+    fig, axes = plt.subplots(1, 2, figsize=figsize)
+    
+    # Get real parts and sort
+    ev_baseline = np.sort(np.real(eigenvalues_baseline))
+    ev_learned = np.sort(np.real(eigenvalues_learned))
+    
+    # Compute condition numbers (filter near-zeros for null space)
+    def compute_condition(eigs):
+        pos_eigs = eigs[eigs > 1e-6]
+        if len(pos_eigs) == 0:
+            return np.inf
+        return pos_eigs.max() / pos_eigs.min()
+    
+    cond_baseline = compute_condition(ev_baseline)
+    cond_learned = compute_condition(ev_learned)
+    
+    # Plot 1: Sorted eigenvalues
+    axes[0].plot(ev_baseline, label=f"Baseline ($\\kappa$={cond_baseline:.1f})", 
+                 marker='.', linestyle='--', alpha=0.6, markersize=3)
+    axes[0].plot(ev_learned, label=f"Learned ($\\kappa$={cond_learned:.1f})", 
+                 marker='x', linestyle='-', alpha=0.6, markersize=3)
+    axes[0].axhline(1.0, color='k', linestyle=':', alpha=0.3)
+    axes[0].set_title(f"{title}")
+    axes[0].set_ylabel("Eigenvalue $\\lambda$")
+    axes[0].set_xlabel("Index")
+    axes[0].legend()
+    axes[0].grid(True, alpha=0.3)
+    
+    # Plot 2: Eigenvalue density histogram
+    axes[1].hist(ev_baseline, bins=50, alpha=0.5, label="Baseline", density=True, color='red')
+    axes[1].hist(ev_learned, bins=50, alpha=0.5, label="Learned", density=True, color='blue')
+    axes[1].axvline(1.0, color='k', linestyle='--', alpha=0.5)
+    axes[1].set_title("Eigenvalue Density Histogram")
+    axes[1].set_xlabel("Eigenvalue $\\lambda$")
+    axes[1].set_ylabel("Density")
+    axes[1].legend()
+    axes[1].grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    return fig
+
+
+def plot_pcg_convergence_comparison(
+    residuals_baseline: List[float],
+    residuals_learned: List[float],
+    residuals_tuned: Optional[List[float]] = None,
+    title: str = "PCG Convergence Comparison",
+    figsize: Tuple[int, int] = (10, 6),
+) -> Figure:
+    """
+    Plot PCG residual convergence curves like the reference script.
+    
+    Args:
+        residuals_baseline: Residual history for baseline (theta=0.0)
+        residuals_learned: Residual history for learned preconditioner
+        residuals_tuned: Optional residual history for tuned (theta=0.25)
+        title: Plot title
+        figsize: Figure size
+        
+    Returns:
+        matplotlib Figure
+    """
+    fig, ax = plt.subplots(figsize=figsize)
+    
+    ax.semilogy(range(len(residuals_baseline)), residuals_baseline, 
+                label=f"PCG + Baseline (θ=0.0) [{len(residuals_baseline)} iters]",
+                linestyle='--', alpha=0.8, linewidth=2)
+    
+    if residuals_tuned is not None:
+        ax.semilogy(range(len(residuals_tuned)), residuals_tuned,
+                    label=f"PCG + Tuned (θ=0.25) [{len(residuals_tuned)} iters]",
+                    linestyle='-.', alpha=0.8, linewidth=2)
+    
+    ax.semilogy(range(len(residuals_learned)), residuals_learned,
+                label=f"PCG + Learned [{len(residuals_learned)} iters]",
+                linestyle='-', alpha=0.9, linewidth=2.5, color='green')
+    
+    ax.set_xlabel("PCG Iteration")
+    ax.set_ylabel("Residual Norm")
+    ax.set_title(title)
+    ax.legend()
+    ax.grid(True, which='both', alpha=0.3)
+    
+    plt.tight_layout()
+    return fig

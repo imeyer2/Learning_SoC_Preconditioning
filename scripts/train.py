@@ -9,6 +9,9 @@ import argparse
 from pathlib import Path
 import sys
 
+import numpy as np
+import torch
+
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
@@ -95,7 +98,26 @@ def main():
     
     print(f"  Experiment dir: {experiment.experiment_dir}")
     print(f"  TensorBoard: {log_dir}")
+
+    # Set up a process to run tensorboard pointed to that logdir and print the address to terminal so user can click and access
+    import subprocess
+    import socket
     
+    def find_free_port():
+        """Find an available port for TensorBoard."""
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind(('', 0))
+            return s.getsockname()[1]
+    
+    tb_port = find_free_port()
+    tb_process = subprocess.Popen(
+        ["tensorboard", "--logdir", str(log_dir), "--port", str(tb_port), "--bind_all"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    print(f"\n  🚀 TensorBoard started at: http://localhost:{tb_port}")
+    print(f"     Click the link above to monitor training in real-time")
+
     # Build training dataset
     print("\n[3/6] Building training dataset...")
     train_data = make_dataset(
@@ -126,6 +148,16 @@ def main():
     
     # Build model
     print("\n[5/6] Building model...")
+    
+    # Set seeds for reproducible model initialization
+    model_seed = data_cfg.train.seed  # Use same seed as training data
+    torch.manual_seed(model_seed)
+    np.random.seed(model_seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(model_seed)
+        torch.cuda.manual_seed_all(model_seed)
+    print(f"  Model initialization seed: {model_seed}")
+    
     model = build_policy_from_config(model_cfg)
     model.to(train_cfg.device)
     
@@ -159,6 +191,15 @@ def main():
     
     # Cleanup
     tb_logger.close()
+    
+    # Terminate TensorBoard process
+    if tb_process.poll() is None:  # Process is still running
+        tb_process.terminate()
+        try:
+            tb_process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            tb_process.kill()
+        print("  TensorBoard process terminated")
     
     # Save metadata
     experiment.save_metadata({

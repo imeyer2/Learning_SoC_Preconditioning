@@ -1,0 +1,54 @@
+{
+  "iterations": {
+    "learned": {
+      "mean": 12.0,
+      "std": 4.753945729601885,
+      "median": 11.0,
+      "min": 7,
+      "max": 25
+    },
+    "baseline": {
+      "mean": 17.64,
+      "std": 7.729838290675944,
+      "median": 16.5,
+      "min": 9,
+      "max": 38
+    },
+    "improvement": {
+      "mean_reduction": 5.640000000000001,
+      "win_rate": 1.0
+    }
+  },
+  "speedup": {
+    "mean": 0.9361543782138712,
+    "std": 0.07466726044542678,
+    "median": 0.9361525039309007,
+    "min": 0.7483976226547022,
+    "max": 1.1333215506068104,
+    "pct_above_1": 0.24,
+    "pct_above_1_5": 0.0,
+    "pct_above_2": 0.0
+  },
+  "correlations": {
+    "correlations": {
+      "theta": -0.12837322028905734,
+      "epsilon": -0.5271409537321211
+    }
+  },
+  "summary": {
+    "n_problems": 50,
+    "learned": {
+      "iterations_mean": 12.0,
+      "iterations_std": 4.753945729601885,
+      "time_mean": 0.0029460620880126954,
+      "convergence_rate_mean": 0.1971087631806759
+    },
+    "baseline": {
+      "iterations_mean": 17.64,
+      "iterations_std": 7.729838290675944,
+      "time_mean": 0.0027956438064575197,
+      "convergence_rate_mean": 0.31742117407540066
+    },
+    "win_rate": 1.0
+  }
+}

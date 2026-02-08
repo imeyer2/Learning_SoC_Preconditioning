@@ -3,12 +3,12 @@
   "grid_size": 1024,
   "n": 1048576,
   "params": {
-    "theta": 0.0532970683167285,
-    "epsilon": 0.09356276728015779
+    "theta": 0.7613129244871258,
+    "epsilon": 0.024493853379855022
   },
-  "learned_iterations": 13,
-  "baseline_iterations": 21,
-  "tuned_iterations": 12,
-  "learned_time": 52.60575604438782,
-  "baseline_time": 2.3859360218048096
+  "learned_iterations": 52,
+  "baseline_iterations": 32,
+  "tuned_iterations": 445,
+  "learned_time": 9.13392186164856,
+  "baseline_time": 2.188754081726074
 }

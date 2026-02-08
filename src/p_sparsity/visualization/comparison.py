@@ -233,3 +233,62 @@ def plot_convergence_comparison_grid(
     
     plt.tight_layout()
     return fig
+
+
+def plot_suite_summary(
+    results: List[Dict],
+    title: str = "PCG Iterations Across Evaluation Suite",
+    figsize: Tuple[int, int] = (12, 6),
+) -> Figure:
+    """
+    Aggregate bar chart showing PCG iterations across multiple test cases.
+    
+    Like the reference script's evaluate_suite_after_training output.
+    
+    Args:
+        results: List of dicts with keys: 'tag', 'it_baseline', 'it_learned', optionally 'it_tuned'
+        title: Plot title
+        figsize: Figure size
+        
+    Returns:
+        matplotlib Figure
+    """
+    fig, ax = plt.subplots(figsize=figsize)
+    
+    labels = [r.get('tag', r.get('name', f'Case {i}')) for i, r in enumerate(results)]
+    baseline_iters = [r.get('it_baseline', r.get('it_std', 0)) for r in results]
+    learned_iters = [r.get('it_learned', 0) for r in results]
+    
+    x = np.arange(len(labels))
+    width = 0.35
+    
+    # Check if tuned results exist
+    has_tuned = any('it_tuned' in r for r in results)
+    if has_tuned:
+        tuned_iters = [r.get('it_tuned', 0) for r in results]
+        width = 0.25
+        ax.bar(x - width, baseline_iters, width, label='Baseline (θ=0.0)', color='#e74c3c', alpha=0.8)
+        ax.bar(x, tuned_iters, width, label='Tuned (θ=0.25)', color='#f39c12', alpha=0.8)
+        ax.bar(x + width, learned_iters, width, label='Learned', color='#2ecc71', alpha=0.8)
+    else:
+        ax.bar(x - width/2, baseline_iters, width, label='Baseline', color='#e74c3c', alpha=0.8)
+        ax.bar(x + width/2, learned_iters, width, label='Learned', color='#2ecc71', alpha=0.8)
+    
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, rotation=20, ha='right')
+    ax.set_ylabel("PCG Iterations")
+    ax.set_title(title)
+    ax.legend()
+    ax.grid(True, alpha=0.3, axis='y')
+    
+    # Add speedup annotations
+    for i, (b, l) in enumerate(zip(baseline_iters, learned_iters)):
+        if l > 0:
+            speedup = b / l
+            ax.annotate(f'{speedup:.2f}×', 
+                       xy=(i + width/2 if not has_tuned else i + width, l), 
+                       xytext=(0, 5), textcoords='offset points',
+                       ha='center', fontsize=9, fontweight='bold', color='green')
+    
+    plt.tight_layout()
+    return fig

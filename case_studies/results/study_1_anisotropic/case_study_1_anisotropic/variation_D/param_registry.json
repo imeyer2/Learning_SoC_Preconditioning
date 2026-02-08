@@ -2,5 +2,5 @@
   "name": "case_study_1_anisotropic_D",
   "train_params": [],
   "test_params": {},
-  "min_distance": 0.05
+  "min_distance": 0.02
 }

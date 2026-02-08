@@ -46,3 +46,14 @@ B_extra: 2  # Number of additional candidates beyond constant vector
 B_head:
   layers: [64]
   activation: relu
+
+# Learnable k (per-node number of edges to select)
+# When enabled, the model predicts how many edges to select per node
+# instead of using a fixed k_per_row
+learn_k: false  # Set to true to enable learnable k
+k_min: 1        # Minimum k value per node
+k_max: 8        # Maximum k value per node
+
+k_head:
+  layers: [32]
+  activation: relu

@@ -35,6 +35,15 @@ from p_sparsity.visualization import (
     plot_C_comparison,
     plot_performance_comparison,
     create_comparison_table,
+    # New plot functions
+    plot_sparse_density_heatmap,
+    plot_C_overlay_heatmap,
+    plot_P_comparison,
+    compute_C_overlap_stats,
+    plot_iteration_bar,
+    plot_eigenvalue_spectra_comparison,
+    plot_pcg_convergence_comparison,
+    plot_suite_summary,
 )
 
 import pyamg
@@ -60,13 +69,40 @@ def load_checkpoint(checkpoint_path: str, device: str = 'cpu'):
     return model, checkpoint
 
 
-def build_baseline_solver(A, B=None):
+def build_baseline_solver(A, B=None, max_levels=None, max_coarse=10):
     """Build standard PyAMG solver for comparison."""
     if B is None:
         B = np.ones((A.shape[0], 1))
     
-    ml = pyamg.smoothed_aggregation_solver(A, B=B)
+    kwargs = {"B": B, "max_coarse": max_coarse}
+    if max_levels is not None:
+        kwargs["max_levels"] = max_levels
+    
+    ml = pyamg.smoothed_aggregation_solver(A, **kwargs)
     return ml
+
+
+def build_tuned_solver(A, theta=0.25, B=None, max_levels=None, max_coarse=10):
+    """Build tuned PyAMG solver with specified theta."""
+    if B is None:
+        B = np.ones((A.shape[0], 1))
+    
+    kwargs = {
+        "strength": ('symmetric', {'theta': theta}),
+        "B": B,
+        "max_coarse": max_coarse,
+    }
+    if max_levels is not None:
+        kwargs["max_levels"] = max_levels
+    
+    # Use symmetric strength with specified theta for ALL levels
+    ml = pyamg.smoothed_aggregation_solver(A, **kwargs)
+    
+    # Also compute C for visualization
+    from pyamg.strength import symmetric_strength_of_connection
+    C_tuned = symmetric_strength_of_connection(A, theta=theta)
+    
+    return ml, C_tuned
 
 
 def evaluate_single_problem(
@@ -102,12 +138,28 @@ def evaluate_single_problem(
         # Prepend constant vector
         B_learned = np.column_stack([np.ones(n), B_learned_extra])
     
-    ml_learned = build_pyamg_solver(A, C_learned, B_learned)
+    # Use consistent max_levels for fair comparison (2 levels = fine + coarse)
+    max_levels = 2
+    max_coarse = 10
     
-    # Build baseline solver
+    ml_learned = build_pyamg_solver(A, C_learned, B_learned, max_levels=max_levels, max_coarse=max_coarse)
+    
+    # Build baseline solver with same hierarchy depth
     if verbose:
         print("Building baseline AMG solver...")
-    ml_baseline = build_baseline_solver(A, B_learned)
+    ml_baseline = build_baseline_solver(A, B_learned, max_levels=max_levels, max_coarse=max_coarse)
+    
+    # Build tuned solver (theta=0.25) with same hierarchy depth
+    if verbose:
+        print("Building tuned AMG solver (θ=0.25)...")
+    ml_tuned, C_tuned = build_tuned_solver(A, theta=0.25, B=B_learned, max_levels=max_levels, max_coarse=max_coarse)
+    
+    # Debug: print solver hierarchy info
+    if verbose:
+        print(f"\nSolver hierarchy info:")
+        print(f"  Learned: {len(ml_learned.levels)} levels, coarse size = {ml_learned.levels[-1].A.shape[0]}")
+        print(f"  Baseline: {len(ml_baseline.levels)} levels, coarse size = {ml_baseline.levels[-1].A.shape[0]}")
+        print(f"  Tuned: {len(ml_tuned.levels)} levels, coarse size = {ml_tuned.levels[-1].A.shape[0]}")
     
     # For baseline, compute standard strength of connection
     # (PyAMG uses symmetric measure with theta=0.0 by default)
@@ -118,8 +170,10 @@ def evaluate_single_problem(
         'A': A,
         'C_learned': C_learned,
         'C_baseline': C_baseline,
+        'C_tuned': C_tuned,
         'ml_learned': ml_learned,
         'ml_baseline': ml_baseline,
+        'ml_tuned': ml_tuned,
     }
     
     # PCG analysis
@@ -130,10 +184,12 @@ def evaluate_single_problem(
         
         pcg_comparison = compare_pcg_performance(
             A, ml_learned, ml_baseline,
+            ml_tuned=ml_tuned,
             num_trials=5,
             max_iter=pcg_config.get('max_iterations', 100),
             tol=pcg_config.get('tolerance', 1e-8),
-            verbose=verbose
+            verbose=verbose,
+            show_progress=True,
         )
         results['pcg'] = pcg_comparison
         
@@ -141,6 +197,8 @@ def evaluate_single_problem(
             print("\nPCG Results:")
             print(f"  Learned:  {pcg_comparison['learned']['avg_iterations']:.1f} iterations")
             print(f"  Baseline: {pcg_comparison['baseline']['avg_iterations']:.1f} iterations")
+            if 'tuned' in pcg_comparison:
+                print(f"  Tuned:    {pcg_comparison['tuned']['avg_iterations']:.1f} iterations")
             print(f"  Speedup:  {pcg_comparison['speedup']:.2f}×")
     
     # V-cycle analysis
@@ -195,10 +253,12 @@ def evaluate_single_problem(
 
 
 def generate_visualizations(results, output_dir: Path, problem_name: str):
-    """Generate and save visualization plots."""
+    """Generate and save visualization plots like the reference script."""
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    # Sparsity comparison
+    print(f"  Generating visualizations for {problem_name}...")
+    
+    # 1. Sparsity comparison (existing)
     if 'C_learned' in results and 'C_baseline' in results:
         fig = plot_C_comparison(
             results['A'],
@@ -206,9 +266,92 @@ def generate_visualizations(results, output_dir: Path, problem_name: str):
             results['C_baseline']
         )
         fig.savefig(output_dir / f"{problem_name}_sparsity.png", dpi=150)
-        print(f"  Saved: {problem_name}_sparsity.png")
+        plt.close(fig)
+        print(f"    Saved: {problem_name}_sparsity.png")
     
-    # More visualizations can be added here...
+    # 2. C overlay heatmap (Red=Baseline, Blue=Learned, Purple=Both)
+    if 'C_learned' in results and 'C_baseline' in results:
+        fig = plot_C_overlay_heatmap(
+            results['C_baseline'],
+            results['C_learned'],
+            title=f"Strength Matrix Overlay ({problem_name})"
+        )
+        fig.savefig(output_dir / f"{problem_name}_C_overlay.png", dpi=150)
+        plt.close(fig)
+        print(f"    Saved: {problem_name}_C_overlay.png")
+        
+        # Print overlap stats
+        overlap_stats = compute_C_overlap_stats(results['C_baseline'], results['C_learned'])
+        print(f"    C Overlap Stats: IoU={overlap_stats['iou']:.4f}, "
+              f"Baseline edges={overlap_stats['n_baseline']}, "
+              f"Learned edges={overlap_stats['n_learned']}")
+    
+    # 3. P (Prolongation) comparison heatmaps
+    if 'ml_learned' in results and 'ml_baseline' in results:
+        try:
+            P_baseline = results['ml_baseline'].levels[0].P
+            P_learned = results['ml_learned'].levels[0].P
+            
+            fig = plot_P_comparison(
+                P_baseline, P_learned,
+                title=f"Prolongation Operator Comparison ({problem_name})",
+                crop=(2000, 2000) if P_baseline.shape[0] > 2000 else None
+            )
+            fig.savefig(output_dir / f"{problem_name}_P_comparison.png", dpi=150)
+            plt.close(fig)
+            print(f"    Saved: {problem_name}_P_comparison.png")
+        except Exception as e:
+            print(f"    Warning: Could not plot P comparison: {e}")
+    
+    # 4. PCG convergence curves
+    if 'pcg' in results and 'residuals' in results['pcg'].get('learned', {}):
+        residuals_baseline = results['pcg']['baseline'].get('residuals', [])
+        residuals_learned = results['pcg']['learned'].get('residuals', [])
+        residuals_tuned = results['pcg'].get('tuned', {}).get('residuals', None)
+        
+        if residuals_baseline and residuals_learned:
+            fig = plot_pcg_convergence_comparison(
+                residuals_baseline,
+                residuals_learned,
+                residuals_tuned=residuals_tuned,
+                title=f"PCG Convergence ({problem_name})"
+            )
+            fig.savefig(output_dir / f"{problem_name}_pcg_convergence.png", dpi=150)
+            plt.close(fig)
+            print(f"    Saved: {problem_name}_pcg_convergence.png")
+    
+    # 5. Iteration bar chart
+    if 'pcg' in results:
+        iterations = {
+            'Baseline': results['pcg']['baseline']['avg_iterations'],
+            'Learned': results['pcg']['learned']['avg_iterations'],
+        }
+        if 'tuned' in results['pcg']:
+            iterations['Tuned (θ=0.25)'] = results['pcg']['tuned']['avg_iterations']
+        
+        fig = plot_iteration_bar(
+            {k: int(v) for k, v in iterations.items()},
+            title=f"PCG Iterations ({problem_name})"
+        )
+        fig.savefig(output_dir / f"{problem_name}_iterations.png", dpi=150)
+        plt.close(fig)
+        print(f"    Saved: {problem_name}_iterations.png")
+    
+    # 6. Eigenvalue spectra (if available and small enough)
+    if 'spectral' in results:
+        spectral = results['spectral']
+        if 'eigenvalues' in spectral.get('learned', {}) and 'eigenvalues' in spectral.get('baseline', {}):
+            fig = plot_eigenvalue_spectra_comparison(
+                spectral['baseline']['eigenvalues'],
+                spectral['learned']['eigenvalues'],
+                title=f"Eigenvalue Spectra ({problem_name})"
+            )
+            fig.savefig(output_dir / f"{problem_name}_spectra.png", dpi=150)
+            plt.close(fig)
+            print(f"    Saved: {problem_name}_spectra.png")
+
+
+import matplotlib.pyplot as plt
 
 
 def main():
@@ -222,7 +365,7 @@ def main():
                        help='Output directory for results')
     parser.add_argument('--device', type=str, default='cpu',
                        help='Device (cpu/cuda)')
-    parser.add_argument('--visualize', action='store_true',
+    parser.add_argument('--visualize', default=True, action='store_true',
                        help='Generate visualization plots')
     
     args = parser.parse_args()
@@ -281,7 +424,7 @@ def main():
         # Evaluate
         results = evaluate_single_problem(
             model, problem_data, eval_config,
-            device=args.device, verbose=True
+            device=args.device, verbose=False
         )
         all_results[test_case.name] = results
         
@@ -344,6 +487,30 @@ def main():
     with open(table_file, 'w') as f:
         f.write(table)
     print(f"Table saved to: {table_file}")
+    
+    # Generate suite summary plot (like the reference script)
+    if args.visualize and len(all_results) > 1:
+        print("\nGenerating suite summary plot...")
+        suite_results = []
+        for name, results in all_results.items():
+            if 'pcg' in results:
+                result_dict = {
+                    'tag': name,
+                    'it_baseline': int(results['pcg']['baseline']['avg_iterations']),
+                    'it_learned': int(results['pcg']['learned']['avg_iterations']),
+                }
+                if 'tuned' in results['pcg']:
+                    result_dict['it_tuned'] = int(results['pcg']['tuned']['avg_iterations'])
+                suite_results.append(result_dict)
+        
+        if suite_results:
+            viz_dir = output_dir / "visualizations"
+            viz_dir.mkdir(parents=True, exist_ok=True)
+            
+            fig = plot_suite_summary(suite_results, title="PCG Iterations Across Evaluation Suite")
+            fig.savefig(viz_dir / "suite_pcg_iterations.png", dpi=150)
+            plt.close(fig)
+            print(f"  Saved: visualizations/suite_pcg_iterations.png")
 
 
 if __name__ == '__main__':

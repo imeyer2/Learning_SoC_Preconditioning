@@ -6,9 +6,9 @@
     "E": 1035.3018764388432,
     "nu": 0.3508132130957718
   },
-  "learned_iterations": 18,
-  "baseline_iterations": 21,
-  "tuned_iterations": 35,
-  "learned_time": 0.01125335693359375,
-  "baseline_time": 0.007462978363037109
+  "learned_iterations": 19,
+  "baseline_iterations": 28,
+  "tuned_iterations": 34,
+  "learned_time": 0.010210752487182617,
+  "baseline_time": 0.00828695297241211
 }
