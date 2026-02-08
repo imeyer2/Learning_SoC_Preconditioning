@@ -4,7 +4,7 @@ Reward functions for RL training.
 Pluggable reward functions that evaluate AMG solver quality.
 """
 
-from typing import Dict, Callable
+from typing import Dict, Callable, Tuple
 import numpy as np
 import scipy.sparse as sp
 import pyamg
@@ -26,6 +26,118 @@ def get_reward_function(name: str) -> Callable:
     if name not in _REWARD_REGISTRY:
         raise KeyError(f"Reward function '{name}' not found. Available: {list(_REWARD_REGISTRY.keys())}")
     return _REWARD_REGISTRY[name]
+
+
+def _compute_reward_worker(args: Tuple) -> Tuple[float, dict]:
+    """
+    Worker function for parallel reward computation.
+    
+    Takes pickled inputs and returns reward and hierarchy info. Used with multiprocessing.
+    
+    Args:
+        args: Tuple of (A_data, C_data, B, reward_name, reward_config, pyamg_config)
+              where A_data and C_data are tuples of (data, indices, indptr, shape)
+              
+    Returns:
+        Tuple of (reward, hierarchy_info dict)
+    """
+    A_data, C_data, B, reward_name, reward_config, pyamg_config = args
+    
+    # Reconstruct sparse matrices
+    A = sp.csr_matrix((A_data[0], A_data[1], A_data[2]), shape=A_data[3])
+    C = sp.csr_matrix((C_data[0], C_data[1], C_data[2]), shape=C_data[3])
+    
+    try:
+        # Build PyAMG solver
+        from ..pyamg_interface import build_pyamg_solver
+        ml = build_pyamg_solver(
+            A, C, B,
+            coarse_solver=pyamg_config.get("coarse_solver", "splu"),
+            max_coarse=pyamg_config.get("max_coarse", 50),
+        )
+        
+        # Collect hierarchy info
+        dofs = [lvl.A.shape[0] for lvl in ml.levels]
+        nnzs = [lvl.A.nnz for lvl in ml.levels]
+        hierarchy_info = {
+            'num_levels': len(ml.levels),
+            'dofs': dofs,
+            'coarsest_dofs': dofs[-1],
+            'operator_complexity': sum(nnzs) / nnzs[0] if nnzs[0] > 0 else 0,
+        }
+        
+        # Compute reward
+        reward_fn = get_reward_function(reward_name)
+        reward = reward_fn(A, ml, reward_config)
+        return (reward, hierarchy_info)
+    except Exception as e:
+        # Return penalty if solver fails
+        return (-5.0, {'error': str(e), 'num_levels': 0, 'dofs': [], 'coarsest_dofs': 0})
+
+
+def compute_rewards_parallel(
+    tasks: list,
+    reward_name: str,
+    reward_config: dict,
+    pyamg_config: dict,
+    n_workers: int = 4,
+    verbose: bool = False,
+) -> Tuple[list, list]:
+    """
+    Compute rewards for multiple (A, C, B) tuples in parallel.
+    
+    Args:
+        tasks: List of (A, C, B) tuples
+        reward_name: Name of reward function
+        reward_config: Reward configuration dict
+        pyamg_config: PyAMG configuration dict
+        n_workers: Number of parallel workers
+        verbose: If True, print hierarchy info
+        
+    Returns:
+        Tuple of (rewards list, hierarchy_infos list)
+    """
+    from concurrent.futures import ProcessPoolExecutor, as_completed
+    
+    # Prepare picklable arguments
+    worker_args = []
+    for A, C, B in tasks:
+        # Convert sparse matrices to picklable format
+        A_data = (A.data.copy(), A.indices.copy(), A.indptr.copy(), A.shape)
+        C_data = (C.data.copy(), C.indices.copy(), C.indptr.copy(), C.shape)
+        worker_args.append((A_data, C_data, B, reward_name, reward_config, pyamg_config))
+    
+    # Run in parallel
+    rewards = [None] * len(tasks)
+    hierarchy_infos = [None] * len(tasks)
+    with ProcessPoolExecutor(max_workers=n_workers) as executor:
+        future_to_idx = {
+            executor.submit(_compute_reward_worker, args): i 
+            for i, args in enumerate(worker_args)
+        }
+        for future in as_completed(future_to_idx):
+            idx = future_to_idx[future]
+            try:
+                reward, info = future.result()
+                rewards[idx] = reward
+                hierarchy_infos[idx] = info
+            except Exception as e:
+                rewards[idx] = -5.0
+                hierarchy_infos[idx] = {'error': str(e)}
+    
+    # Print summary if verbose
+    if verbose and hierarchy_infos:
+        valid_infos = [h for h in hierarchy_infos if h and 'dofs' in h and h['dofs']]
+        if valid_infos:
+            avg_levels = np.mean([h['num_levels'] for h in valid_infos])
+            avg_coarsest = np.mean([h['coarsest_dofs'] for h in valid_infos])
+            max_coarsest = max(h['coarsest_dofs'] for h in valid_infos)
+            print(f"  Batch hierarchy stats: avg_levels={avg_levels:.1f}, "
+                  f"avg_coarsest={avg_coarsest:.0f}, max_coarsest={max_coarsest}")
+            if max_coarsest > 500:
+                print(f"  ⚠️  Large coarse grids detected (max={max_coarsest}) - may cause slowdown")
+                
+    return rewards, hierarchy_infos
 
 
 def energy_norm_sq(A: sp.csr_matrix, e: np.ndarray) -> float:

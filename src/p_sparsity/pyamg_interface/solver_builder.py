@@ -22,6 +22,73 @@ from .sampling import sample_deterministic_topk
 HierarchyStrategy = Literal["hybrid", "full_gnn", "predefined_only"]
 
 
+def print_hierarchy_info(ml: pyamg.multilevel.MultilevelSolver, prefix: str = "") -> dict:
+    """
+    Print and return AMG hierarchy information.
+    
+    Args:
+        ml: PyAMG multilevel solver
+        prefix: Optional prefix for print statements
+        
+    Returns:
+        dict with hierarchy stats
+    """
+    num_levels = len(ml.levels)
+    dofs = [lvl.A.shape[0] for lvl in ml.levels]
+    nnzs = [lvl.A.nnz for lvl in ml.levels]
+    
+    # Coarsening factors
+    coarsening_factors = []
+    for i in range(num_levels - 1):
+        cf = dofs[i] / dofs[i+1] if dofs[i+1] > 0 else float('inf')
+        coarsening_factors.append(cf)
+    
+    # Operator complexity
+    total_nnz = sum(nnzs)
+    op_complexity = total_nnz / nnzs[0] if nnzs[0] > 0 else float('inf')
+    
+    # Grid complexity
+    total_dofs = sum(dofs)
+    grid_complexity = total_dofs / dofs[0] if dofs[0] > 0 else float('inf')
+    
+    print(f"{prefix}AMG Hierarchy: {num_levels} levels")
+    print(f"{prefix}  Level | DOFs      | NNZ        | Coarsening Factor")
+    print(f"{prefix}  ------|-----------|------------|------------------")
+    for i, (d, n) in enumerate(zip(dofs, nnzs)):
+        cf = f"{coarsening_factors[i]:.2f}x" if i < len(coarsening_factors) else "(coarsest)"
+        print(f"{prefix}  {i:5d} | {d:9d} | {n:10d} | {cf}")
+    print(f"{prefix}  Operator complexity: {op_complexity:.3f}")
+    print(f"{prefix}  Grid complexity: {grid_complexity:.3f}")
+    print(f"{prefix}  Coarsest DOFs: {dofs[-1]} (direct solve)")
+    
+    # Warning if coarse grid is large
+    if dofs[-1] > 500:
+        print(f"{prefix}  ⚠️  WARNING: Coarse grid has {dofs[-1]} DOFs - direct solve may be expensive!")
+    
+    return {
+        'num_levels': num_levels,
+        'dofs_per_level': dofs,
+        'nnz_per_level': nnzs,
+        'coarsening_factors': coarsening_factors,
+        'operator_complexity': op_complexity,
+        'grid_complexity': grid_complexity,
+    }
+
+
+def get_hierarchy_summary(ml: pyamg.multilevel.MultilevelSolver) -> str:
+    """
+    Get a one-line summary of the hierarchy.
+    
+    Returns:
+        String like "3 lvls: 1024→256→16 (OC=1.28)"
+    """
+    dofs = [lvl.A.shape[0] for lvl in ml.levels]
+    nnzs = [lvl.A.nnz for lvl in ml.levels]
+    op_complexity = sum(nnzs) / nnzs[0] if nnzs[0] > 0 else 0
+    dof_str = "→".join(str(d) for d in dofs)
+    return f"{len(dofs)} lvls: {dof_str} (OC={op_complexity:.2f})"
+
+
 def C_from_selected_edges(
     A: sp.csr_matrix,
     edge_index_cpu: torch.Tensor,

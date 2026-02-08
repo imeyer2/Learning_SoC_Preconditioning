@@ -207,3 +207,26 @@ If you use this code in your research, please cite:
 
 MIT License - see LICENSE file for details
 # Learning_SoC_Preconditioning
+
+
+Logging onto Swan
+
+Standard ssh should work fine. Once on Swan, execute conda activate sipbuddy and module avail cuda will list all cuda core modules by HPC admins.
+
+1. Start an interactive GPU session
+
+From the login node run:
+
+salloc -p gpu --gres=gpu:1 --mem=32G -t 02:00:00
+
+# will print 
+salloc: Granted job allocation <job number>
+salloc: Nodes c1310 are ready for job
+# potentially run things like
+srun --jobid=<job number> --pty bash
+module load cuda/12.4
+-p gpu → use the GPU partition
+--gres=gpu:1 → request 1 GPU
+--mem=32G → 32 GB RAM
+-t 02:00:00 → 2 hours wall time
+This will hang for a bit, then drop you into a GPU compute node shell (your prompt will change from login1 to something like c1318).

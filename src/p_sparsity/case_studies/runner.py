@@ -90,11 +90,13 @@ class CaseStudyRunner:
         output_dir: Optional[Path] = None,
         device: str = 'cpu',
         verbose: bool = True,
+        parallel_workers: int = 1,
     ):
         self.config = config
         self.output_dir = Path(output_dir or config.output_dir) / config.name
         self.device = device
         self.verbose = verbose
+        self.parallel_workers = parallel_workers
         
         # Create output directory
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -466,6 +468,7 @@ class CaseStudyRunner:
         train_cfg.batch_size = var_config.train.batch_size
         train_cfg.optimizer.lr = var_config.train.learning_rate
         train_cfg.device = self.device
+        train_cfg.parallel_workers = self.parallel_workers
         train_cfg.experiment.output_dir = str(output_dir)
         
         # Override entropy and temperature from case study config if specified

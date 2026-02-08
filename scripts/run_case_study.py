@@ -11,6 +11,7 @@ Usage:
 import argparse
 import sys
 from pathlib import Path
+import torch
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -183,8 +184,8 @@ Examples:
     parser.add_argument(
         "--device",
         type=str,
-        default="cpu",
-        help="Device for training/inference (cpu/cuda)"
+        default=None,
+        help="Device for training/inference (cpu/cuda). Default: auto-detect CUDA"
     )
     parser.add_argument(
         "--quiet",
@@ -196,6 +197,13 @@ Examples:
         action="store_true",
         dest="skip_training",
         help="Skip training and only run evaluation (requires --init-from)"
+    )
+    parser.add_argument(
+        "--parallel-workers",
+        type=int,
+        default=1,
+        dest="parallel_workers",
+        help="Number of parallel workers for reward computation (1=sequential, 4-16 recommended on HPC)"
     )
     
     args = parser.parse_args()
@@ -209,6 +217,11 @@ Examples:
 
 def main():
     args = parse_args()
+    
+    
+    # Auto-detect CUDA if device not specified
+    if args.device is None:
+        args.device = "cuda" if torch.cuda.is_available() else "cpu"
     
     from p_sparsity.case_studies import (
         CaseStudyConfig,
@@ -284,7 +297,17 @@ def main():
             print_colored(f"      📈 This is a SCALING STUDY", Colors.CYAN)
     
     # Device info
-    print_colored(f"\n💻 Device: {args.device}", Colors.CYAN)
+    if args.device == "cuda":
+        cuda_device = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "N/A"
+        print_colored(f"\n💻 Device: {args.device} ({cuda_device})", Colors.CYAN)
+    else:
+        print_colored(f"\n💻 Device: {args.device}", Colors.CYAN)
+    
+    # Parallel workers info
+    if args.parallel_workers > 1:
+        print_colored(f"⚡ Parallel workers: {args.parallel_workers} (faster reward computation)", Colors.CYAN)
+    else:
+        print_colored(f"⚡ Parallel workers: 1 (sequential, use --parallel-workers N for speedup)", Colors.YELLOW)
     
     # Output info
     output_path = Path(args.output) if args.output else Path(config.output_dir) / config.name
@@ -305,6 +328,7 @@ def main():
         output_dir=Path(args.output) if args.output else None,
         device=args.device,
         verbose=not args.quiet,
+        parallel_workers=args.parallel_workers,
     )
     
     # Run variations

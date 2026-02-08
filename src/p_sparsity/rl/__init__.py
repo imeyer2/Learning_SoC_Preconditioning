@@ -9,6 +9,7 @@ from .rewards import (
     vcycle_energy_reduction_reward,
     register_reward,
     get_reward_function,
+    compute_rewards_parallel,
 )
 from .baselines import MovingAverageBaseline
 
@@ -17,5 +18,6 @@ __all__ = [
     "vcycle_energy_reduction_reward",
     "register_reward",
     "get_reward_function",
+    "compute_rewards_parallel",
     "MovingAverageBaseline",
 ]

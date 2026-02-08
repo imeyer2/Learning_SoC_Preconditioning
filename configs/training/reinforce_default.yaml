@@ -86,6 +86,12 @@ baseline:
 # Recommended: 0.01-0.1
 entropy_coef: 0.01
 
+# Parallel reward computation
+# Speeds up training by computing PyAMG rewards across multiple CPU cores
+# Recommended: Set to number of CPU cores available (e.g., 8-16 on HPC)
+parallel_workers: 1  # Number of parallel workers (1 = sequential)
+parallel_batch_size: 8  # Batch size for parallel training
+
 # Logging and checkpointing
 logging:
   log_interval: 1  # Log every N steps
@@ -102,6 +108,10 @@ experiment:
 # PyAMG solver settings
 pyamg:
   coarse_solver: splu  # splu, lu, cg, gauss_seidel
+  max_coarse: 50  # Maximum DOFs on coarsest level (larger = faster setup, slower V-cycle)
+  # ⚠️ If max_coarse is too large, direct solve becomes expensive
+  # For small training grids (16x16=256 DOFs), max_coarse=50 is fine
+  # For larger grids, keep max_coarse small (10-50)
   
 # Device
 device: cpu  # cpu or cuda
