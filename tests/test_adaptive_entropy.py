@@ -131,5 +131,5 @@ class TestAdaptiveEntropy:
         for _ in range(200):
             trainer._adapt_entropy_coef(0.2)
 
-        # Coefficient should have increased substantially
-        assert trainer.entropy_coef > 0.05
+        # Coefficient should have increased substantially toward max
+        assert trainer.entropy_coef > 0.2

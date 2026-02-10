@@ -140,11 +140,7 @@ class ReinforceTrainer:
         encourage more exploration. If above, decrease it.
         
         Uses a simple proportional controller:
-            coef += rate * (current_entropy - target_entropy)
-        
-        Note: We increase coef when entropy is too LOW (below target),
-        so the sign is: coef += rate * (target - current) because a
-        higher coef pushes entropy up.
+            coef += rate * (target_entropy - current_entropy)
         """
         if not self.adaptive_entropy:
             return
