@@ -10,9 +10,9 @@ batch_size: 1  # Process one problem at a time (policy gradient per problem)
 # Optimizer
 optimizer:
   type: adam
-  lr: 0.002
+  lr: 0.001
   weight_decay: 0.0
-  grad_clip: 1.0
+  grad_clip: 5.0
 
 # Learning rate scheduler (optional)
 scheduler:
@@ -25,8 +25,8 @@ scheduler:
 temperature:
   initial: 0.9
   anneal: true
-  anneal_factor: 0.97
-  min_temperature: 0.5
+  anneal_factor: 0.995
+  min_temperature: 0.7
 
 # Sampling strategy
 sampling:
@@ -84,7 +84,16 @@ baseline:
 # Entropy coefficient for exploration bonus
 # Higher = more exploration, Lower = more exploitation
 # Recommended: 0.01-0.1
-entropy_coef: 0.01
+entropy_coef: 0.05
+
+# Adaptive entropy coefficient (auto-adjusts entropy_coef to maintain target entropy)
+# When enabled, entropy_coef is adjusted each step to prevent entropy collapse
+adaptive_entropy:
+  enabled: true
+  target_entropy: 1.0      # Target policy entropy to maintain
+  adaptation_rate: 0.001   # Step size for entropy_coef adjustment
+  min_coef: 0.001          # Minimum entropy_coef
+  max_coef: 0.5            # Maximum entropy_coef
 
 # Parallel reward computation
 # Speeds up training by computing PyAMG rewards across multiple CPU cores
