@@ -82,6 +82,17 @@ class ReinforceTrainer:
         # Entropy coefficient for exploration bonus
         self.entropy_coef = getattr(config, 'entropy_coef', 0.01)
         
+        # Adaptive entropy coefficient (auto-adjusts to maintain target entropy)
+        adaptive_cfg = getattr(config, 'adaptive_entropy', None)
+        if adaptive_cfg is not None and getattr(adaptive_cfg, 'enabled', False):
+            self.adaptive_entropy = True
+            self.entropy_target = getattr(adaptive_cfg, 'target_entropy', 1.0)
+            self.entropy_adapt_rate = getattr(adaptive_cfg, 'adaptation_rate', 0.001)
+            self.entropy_coef_min = getattr(adaptive_cfg, 'min_coef', 0.001)
+            self.entropy_coef_max = getattr(adaptive_cfg, 'max_coef', 0.5)
+        else:
+            self.adaptive_entropy = False
+        
         # Parallel reward computation settings
         self.parallel_workers = getattr(config, 'parallel_workers', 1)
         self.parallel_batch_size = getattr(config, 'parallel_batch_size', 8)
@@ -120,6 +131,24 @@ class ReinforceTrainer:
             "advantage": [],
             "loss": [],
         }
+    
+    def _adapt_entropy_coef(self, entropy_value: float):
+        """
+        Adapt entropy coefficient to maintain target entropy level.
+        
+        If current entropy is below target, increase the coefficient to
+        encourage more exploration. If above, decrease it.
+        
+        Uses a simple proportional controller:
+            coef += rate * (target_entropy - current_entropy)
+        """
+        if not self.adaptive_entropy:
+            return
+        
+        error = self.entropy_target - entropy_value
+        self.entropy_coef += self.entropy_adapt_rate * error
+        self.entropy_coef = max(self.entropy_coef_min,
+                                min(self.entropy_coef_max, self.entropy_coef))
     
     def _build_optimizer(self) -> torch.optim.Optimizer:
         """Build optimizer from config."""
@@ -506,6 +535,9 @@ class ReinforceTrainer:
         entropy_bonus = -self.entropy_coef * entropy
         loss = policy_loss + entropy_bonus
         
+        # Adapt entropy coefficient toward target entropy level
+        self._adapt_entropy_coef(float(entropy.item()))
+        
         # Backpropagation
         self.optimizer.zero_grad()
         loss.backward()
@@ -538,6 +570,10 @@ class ReinforceTrainer:
             self.tb_logger.log_scalar("train/advantage", advantage, self.step)
             self.tb_logger.log_scalar("train/loss", float(loss.detach().cpu().item()), self.step)
             self.tb_logger.log_scalar("train/entropy", float(entropy.item()), self.step)
+            
+            # Log adaptive entropy coefficient
+            if self.adaptive_entropy:
+                self.tb_logger.log_scalar("train/entropy_coef", self.entropy_coef, self.step)
             
             # Log baseline std if available
             if hasattr(self.baseline, 'get_std'):
@@ -688,6 +724,9 @@ class ReinforceTrainer:
             entropy_bonus = -self.entropy_coef * entropy
             loss = policy_loss + entropy_bonus
             total_loss += loss
+            
+            # Adapt entropy coefficient toward target entropy level
+            self._adapt_entropy_coef(float(entropy.item()))
             
             # Store history
             self.history["train_reward"].append(R)
