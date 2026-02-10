@@ -12,6 +12,8 @@ from tqdm import tqdm
 from ...data import TrainSample
 from ...pyamg_interface import (
     sample_topk_without_replacement,
+    sample_topk_fully_vectorized,
+    build_row_csr,
     C_from_selected_edges,
     build_B_for_pyamg,
     build_pyamg_solver,
@@ -380,8 +382,9 @@ class ReinforceTrainer:
         x = sample.x.to(self.config.device)
         ei = sample.edge_index.to(self.config.device)
         ew = sample.edge_weight.to(self.config.device)
-        # Move row_groups to device once (avoids repeated transfers in sampling loop)
-        row_groups_device = [rg.to(self.config.device) for rg in sample.row_groups]
+        # Build CSR format for vectorized sampling (much faster than row_groups list)
+        num_nodes = sample.A.shape[0]
+        row_ptr, perm = build_row_csr(ei, num_nodes)
         if self.config.device == 'cuda':
             torch.cuda.synchronize()
         self.timing['data_transfer'] += time.perf_counter() - t0
@@ -426,10 +429,11 @@ class ReinforceTrainer:
         else:
             k_to_use = self.config.sampling.k_per_row
         
-        # Sample edges from policy
-        selected_mask_t, logp_sum = sample_topk_without_replacement(
+        # Sample edges using vectorized Gumbel-top-k (much faster than sequential)
+        selected_mask_t, logp_sum = sample_topk_fully_vectorized(
             logits=logits,
-            row_groups=row_groups_device,
+            row_ptr=row_ptr,
+            perm=perm,
             k=k_to_use,
             temperature=temperature,
             gumbel=self.config.sampling.get("gumbel", True),
@@ -592,7 +596,9 @@ class ReinforceTrainer:
             x = sample.x.to(self.config.device)
             ei = sample.edge_index.to(self.config.device)
             ew = sample.edge_weight.to(self.config.device)
-            row_groups_device = [rg.to(self.config.device) for rg in sample.row_groups]
+            # Build CSR format for vectorized sampling
+            num_nodes = sample.A.shape[0]
+            row_ptr, perm = build_row_csr(ei, num_nodes)
             
             # Forward pass
             output = self.model(x, ei, ew, return_internals=False)
@@ -605,16 +611,17 @@ class ReinforceTrainer:
                 logits, B_extra = output[:2]
                 k_per_node = None
             
-            # Sample edges
+            # Sample edges using vectorized Gumbel-top-k
             learnable_k = self.config.sampling.get("learnable_k", False)
             if learnable_k and k_per_node is not None:
                 k_to_use = k_per_node
             else:
                 k_to_use = self.config.sampling.k_per_row
             
-            selected_mask_t, logp_sum = sample_topk_without_replacement(
+            selected_mask_t, logp_sum = sample_topk_fully_vectorized(
                 logits=logits,
-                row_groups=row_groups_device,
+                row_ptr=row_ptr,
+                perm=perm,
                 k=k_to_use,
                 temperature=temperature,
                 gumbel=self.config.sampling.get("gumbel", True),

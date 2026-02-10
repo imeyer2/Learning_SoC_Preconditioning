@@ -17,6 +17,9 @@ from .sampling import (
     sample_topk_without_replacement,
     sample_deterministic_topk,
     build_row_groups,
+    build_row_csr,
+    sample_topk_vectorized,
+    sample_topk_fully_vectorized,
 )
 
 __all__ = [
@@ -29,4 +32,7 @@ __all__ = [
     "sample_topk_without_replacement",
     "sample_deterministic_topk",
     "build_row_groups",
+    "build_row_csr",
+    "sample_topk_vectorized",
+    "sample_topk_fully_vectorized",
 ]

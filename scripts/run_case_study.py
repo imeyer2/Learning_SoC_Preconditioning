@@ -205,6 +205,12 @@ Examples:
         dest="parallel_workers",
         help="Number of parallel workers for reward computation (1=sequential, 4-16 recommended on HPC)"
     )
+    parser.add_argument(
+        "--no-timing",
+        action="store_true",
+        dest="no_timing",
+        help="Disable timing breakdown output after each epoch"
+    )
     
     args = parser.parse_args()
     
@@ -221,7 +227,12 @@ def main():
     
     # Auto-detect CUDA if device not specified
     if args.device is None:
-        args.device = "cuda" if torch.cuda.is_available() else "cpu"
+        if torch.cuda.is_available():
+            args.device = "cuda"
+        elif torch.backends.mps.is_available():
+            args.device = "mps"
+        else:
+            args.device = "cpu"
     
     from p_sparsity.case_studies import (
         CaseStudyConfig,
@@ -329,6 +340,7 @@ def main():
         device=args.device,
         verbose=not args.quiet,
         parallel_workers=args.parallel_workers,
+        timing_enabled=not args.no_timing,
     )
     
     # Run variations

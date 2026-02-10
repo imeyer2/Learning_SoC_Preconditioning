@@ -91,12 +91,14 @@ class CaseStudyRunner:
         device: str = 'cpu',
         verbose: bool = True,
         parallel_workers: int = 1,
+        timing_enabled: bool = True,
     ):
         self.config = config
         self.output_dir = Path(output_dir or config.output_dir) / config.name
         self.device = device
         self.verbose = verbose
         self.parallel_workers = parallel_workers
+        self.timing_enabled = timing_enabled
         
         # Create output directory
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -470,6 +472,9 @@ class CaseStudyRunner:
         train_cfg.device = self.device
         train_cfg.parallel_workers = self.parallel_workers
         train_cfg.experiment.output_dir = str(output_dir)
+        
+        # Override timing output
+        train_cfg.timing_enabled = self.timing_enabled
         
         # Override entropy and temperature from case study config if specified
         if hasattr(var_config.train, 'entropy_coef') and var_config.train.entropy_coef is not None:

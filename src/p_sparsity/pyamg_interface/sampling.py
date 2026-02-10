@@ -3,6 +3,8 @@ Edge sampling strategies for policy network.
 
 Implements stochastic sampling of edges per row for building C matrix.
 Supports both fixed k (same for all nodes) and per-node k values.
+
+Optimized with vectorized operations for faster sampling.
 """
 
 from typing import List, Tuple, Union, Optional
@@ -29,6 +31,257 @@ def build_row_groups(edge_index: torch.Tensor, num_nodes: int) -> List[torch.Ten
         buckets[int(r)].append(e)
     
     return [torch.tensor(b, dtype=torch.long) for b in buckets]
+
+
+def build_row_csr(edge_index: torch.Tensor, num_nodes: int) -> Tuple[torch.Tensor, torch.Tensor]:
+    """
+    Build CSR-format row pointers for vectorized segment operations.
+    
+    Args:
+        edge_index: (2, E) edge connectivity  
+        num_nodes: Number of nodes
+        
+    Returns:
+        row_ptr: (N+1,) CSR row pointers
+        perm: (E,) permutation to sort edges by source node
+    """
+    row = edge_index[0]
+    device = row.device
+    
+    # Sort edges by source node
+    perm = torch.argsort(row)
+    sorted_row = row[perm]
+    
+    # Count edges per node
+    E = row.numel()
+    counts = torch.zeros(num_nodes, dtype=torch.long, device=device)
+    counts.scatter_add_(0, sorted_row, torch.ones(E, dtype=torch.long, device=device))
+    
+    # Build CSR row pointers
+    row_ptr = torch.zeros(num_nodes + 1, dtype=torch.long, device=device)
+    row_ptr[1:] = torch.cumsum(counts, dim=0)
+    
+    return row_ptr, perm
+
+
+def sample_topk_vectorized(
+    logits: torch.Tensor,
+    row_ptr: torch.Tensor,
+    perm: torch.Tensor,
+    k: Union[int, torch.Tensor],
+    temperature: float = 1.0,
+    gumbel: bool = True,
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    """
+    Vectorized sampling using Gumbel-top-k trick.
+    
+    This is MUCH faster than the sequential version because:
+    1. All Gumbel noise is generated in one batch
+    2. Top-k per segment is done with vectorized segment operations
+    3. Log-probability computed in parallel
+    
+    Args:
+        logits: (E,) edge logits from policy
+        row_ptr: (N+1,) CSR row pointers from build_row_csr
+        perm: (E,) permutation from build_row_csr
+        k: Number of edges to sample per row
+        temperature: Temperature for softmax
+        gumbel: Whether to use Gumbel noise for sampling
+        
+    Returns:
+        selected_mask: (E,) bool tensor indicating selected edges (in original order)
+        logprob_sum: Scalar tensor with sum of log probabilities
+    """
+    device = logits.device
+    E = logits.numel()
+    N = row_ptr.numel() - 1
+    tau = max(float(temperature), 1e-6)
+    
+    # Permute logits to sorted order
+    sorted_logits = logits[perm] / tau
+    
+    # Handle per-node k values  
+    if isinstance(k, torch.Tensor):
+        k_per_node = k.to(device)
+    else:
+        k_per_node = torch.full((N,), k, dtype=torch.long, device=device)
+    
+    # Compute segment lengths
+    lengths = row_ptr[1:] - row_ptr[:-1]
+    
+    # Clamp k to available edges per node
+    k_actual = torch.minimum(k_per_node, lengths)
+    
+    # Create node assignment for each edge (which node does each edge belong to)
+    node_ids = torch.zeros(E, dtype=torch.long, device=device)
+    for i in range(N):
+        start, end = row_ptr[i].item(), row_ptr[i+1].item()
+        if end > start:
+            node_ids[start:end] = i
+    
+    # Add Gumbel noise for sampling
+    if gumbel:
+        u = torch.rand(E, device=device)
+        g = -torch.log(-torch.log(u + 1e-12) + 1e-12)
+        perturbed_logits = sorted_logits + g
+    else:
+        perturbed_logits = sorted_logits
+    
+    # For each segment, select top-k by perturbed logits
+    selected_sorted = torch.zeros(E, dtype=torch.bool, device=device)
+    logp_total = torch.zeros((), dtype=torch.float32, device=device)
+    
+    # Compute softmax probabilities per segment for log-prob
+    # Use segment-wise softmax: exp(x_i) / sum_j exp(x_j) for j in segment
+    max_per_seg = torch.segment_reduce(sorted_logits, 'max', lengths=lengths)
+    max_per_seg = torch.where(lengths > 0, max_per_seg, torch.zeros_like(max_per_seg))
+    
+    # Expand max back to edges for numerical stability
+    expanded_max = max_per_seg[node_ids]
+    exp_logits = torch.exp(sorted_logits - expanded_max)
+    
+    # Sum exp per segment
+    sum_exp = torch.zeros(N, device=device)
+    sum_exp.scatter_add_(0, node_ids, exp_logits)
+    
+    # Probabilities
+    probs = exp_logits / (sum_exp[node_ids] + 1e-12)
+    
+    # Process each segment to select top-k
+    # This loop is over nodes but does minimal work per node
+    for i in range(N):
+        start = row_ptr[i].item()
+        end = row_ptr[i+1].item()
+        kk = k_actual[i].item()
+        
+        if kk <= 0 or start >= end:
+            continue
+        
+        # Get top-k indices within this segment
+        segment_perturbed = perturbed_logits[start:end]
+        if kk >= end - start:
+            # Select all
+            selected_sorted[start:end] = True
+            logp_total = logp_total + torch.log(probs[start:end] + 1e-12).sum()
+        else:
+            # Select top-k
+            _, topk_local = torch.topk(segment_perturbed, kk)
+            topk_global = start + topk_local
+            selected_sorted[topk_global] = True
+            
+            # Log prob of selecting these k edges (approximation for without-replacement)
+            # For Gumbel-top-k, this is sum of log-probs of selected items
+            logp_total = logp_total + torch.log(probs[topk_global] + 1e-12).sum()
+    
+    # Unpermute to original edge order
+    inv_perm = torch.argsort(perm)
+    selected_mask = selected_sorted[inv_perm]
+    
+    return selected_mask, logp_total
+
+
+def sample_topk_fully_vectorized(
+    logits: torch.Tensor,
+    row_ptr: torch.Tensor,
+    perm: torch.Tensor,
+    k: Union[int, torch.Tensor],
+    temperature: float = 1.0,
+    gumbel: bool = True,
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    """
+    Fully vectorized Gumbel-top-k sampling without any Python loops.
+    
+    Uses a ranking approach: for each edge, compute its rank within its segment,
+    then select edges with rank < k.
+    
+    Args:
+        logits: (E,) edge logits from policy
+        row_ptr: (N+1,) CSR row pointers
+        perm: (E,) permutation from build_row_csr
+        k: Number of edges to sample per row
+        temperature: Temperature for softmax
+        gumbel: Whether to use Gumbel noise
+        
+    Returns:
+        selected_mask: (E,) bool tensor (original order)
+        logprob_sum: Scalar log probability
+    """
+    device = logits.device
+    E = logits.numel()
+    N = row_ptr.numel() - 1
+    tau = max(float(temperature), 1e-6)
+    
+    if E == 0:
+        return torch.zeros(0, dtype=torch.bool, device=device), torch.tensor(0.0, device=device)
+    
+    # Permute logits to sorted-by-node order
+    sorted_logits = logits[perm] / tau
+    
+    # Build node_ids: which segment each edge belongs to
+    lengths = row_ptr[1:] - row_ptr[:-1]
+    node_ids = torch.repeat_interleave(torch.arange(N, device=device), lengths)
+    
+    # Handle per-node k  
+    if isinstance(k, torch.Tensor):
+        k_per_node = k.to(device)
+    else:
+        k_per_node = torch.full((N,), k, dtype=torch.long, device=device)
+    
+    # Clamp k to segment lengths
+    k_actual = torch.minimum(k_per_node, lengths)
+    
+    # Add Gumbel noise
+    if gumbel:
+        u = torch.rand(E, device=device)
+        g = -torch.log(-torch.log(u + 1e-12) + 1e-12)
+        perturbed = sorted_logits + g
+    else:
+        perturbed = sorted_logits
+    
+    # Compute rank of each edge within its segment (0 = highest perturbed value)
+    # Strategy: negate perturbed, argsort gives ranking
+    # But we need per-segment ranking...
+    
+    # Add large offset per segment to ensure segments don't mix
+    # offset = node_id * (max_perturbed + 1) then argsort
+    max_val = perturbed.max().item() + 1
+    offset_perturbed = -perturbed + node_ids.float() * (max_val * 2)
+    
+    # Argsort gives global order, then compute rank
+    order = torch.argsort(offset_perturbed)
+    ranks = torch.zeros(E, dtype=torch.long, device=device)
+    ranks[order] = torch.arange(E, device=device)
+    
+    # Convert global ranks to within-segment ranks
+    # segment_start_rank[i] = row_ptr[i]
+    segment_start_rank = row_ptr[node_ids]
+    within_segment_rank = ranks - segment_start_rank
+    
+    # Select edges where within_segment_rank < k_actual[node_id]
+    k_for_edge = k_actual[node_ids]
+    selected_sorted = within_segment_rank < k_for_edge
+    
+    # Compute log probabilities using segment softmax
+    # First compute segment-wise max for numerical stability
+    max_per_seg = torch.segment_reduce(sorted_logits, 'max', lengths=lengths)
+    # Handle empty segments
+    max_per_seg = torch.where(lengths > 0, max_per_seg, torch.zeros_like(max_per_seg))
+    expanded_max = max_per_seg[node_ids]
+    
+    exp_logits = torch.exp(sorted_logits - expanded_max)
+    sum_exp = torch.zeros(N, device=device)
+    sum_exp.scatter_add_(0, node_ids, exp_logits)
+    probs = exp_logits / (sum_exp[node_ids] + 1e-12)
+    
+    # Sum log-probs of selected edges
+    log_probs = torch.log(probs + 1e-12)
+    logp_total = (log_probs * selected_sorted.float()).sum()
+    
+    # Unpermute to original order
+    inv_perm = torch.argsort(perm)
+    selected_mask = selected_sorted[inv_perm]
+    
+    return selected_mask, logp_total
 
 
 def sample_topk_without_replacement(
