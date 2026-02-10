@@ -31,7 +31,7 @@ variations:
     
     train:
       grid_size: 32          # Single grid size
-      num_samples: 200      # 30 training samples
+      num_samples: 150      # 150 training samples
       seed: 42
     
     test:
@@ -48,7 +48,7 @@ variations:
     
     train:
       grid_sizes: [32, 48, 64]   # Train on small grids
-      samples_per_size: 30       # 90 total training samples
+      samples_per_size: 45       # 135 total training samples
       seed: 42
     
     test:

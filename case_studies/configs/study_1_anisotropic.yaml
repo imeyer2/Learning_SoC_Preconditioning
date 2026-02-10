@@ -32,7 +32,7 @@ variations:
       Tests within-distribution generalization.
     train:
       grid_size: 128
-      num_samples: 30
+      num_samples: 150
       seed: 42
       epochs: 50
       batch_size: 2
@@ -55,7 +55,7 @@ variations:
       Tests scalability and size generalization.
     train:
       grid_size: 32
-      num_samples: 30
+      num_samples: 150
       seed: 42
       epochs: 50
       batch_size: 1

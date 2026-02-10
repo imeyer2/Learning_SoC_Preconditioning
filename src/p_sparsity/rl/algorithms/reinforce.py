@@ -491,11 +491,12 @@ class ReinforceTrainer:
         t0 = time.perf_counter()
         # Compute policy entropy for exploration bonus
         # H(π) = -Σ p(a) log p(a)
-        with torch.no_grad():
-            probs = torch.softmax(logits_for_diag / temperature, dim=-1)
-            log_probs = torch.log_softmax(logits_for_diag / temperature, dim=-1)
-            entropy = -torch.sum(probs * log_probs, dim=-1).mean()
-        
+        # NOTE: Use original logits (not logits_for_diag which is detached) to allow
+        # entropy gradients to flow back through the policy network
+        probs = torch.softmax(logits / temperature, dim=-1)
+        log_probs = torch.log_softmax(logits / temperature, dim=-1)
+        entropy = -torch.sum(probs * log_probs, dim=-1).mean()
+
         # REINFORCE loss: -advantage * logprob - entropy_coef * entropy
         # Entropy bonus encourages exploration (negative because we minimize loss)
         policy_loss = -(
@@ -674,11 +675,10 @@ class ReinforceTrainer:
             # Update baseline and compute advantage
             advantage = self.baseline.update(R)
             
-            # Compute entropy
-            with torch.no_grad():
-                probs = torch.softmax(data['logits'] / temperature, dim=-1)
-                log_probs = torch.log_softmax(data['logits'] / temperature, dim=-1)
-                entropy = -torch.sum(probs * log_probs, dim=-1).mean()
+            # Compute entropy (NOT inside no_grad - we need gradients for entropy bonus!)
+            probs = torch.softmax(data['logits'] / temperature, dim=-1)
+            log_probs = torch.log_softmax(data['logits'] / temperature, dim=-1)
+            entropy = -torch.sum(probs * log_probs, dim=-1).mean()
             
             # REINFORCE loss
             policy_loss = -(
